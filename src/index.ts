@@ -2,6 +2,7 @@ import express from 'express';
 import dotenv from 'dotenv';
 import mongoose from 'mongoose';
 import router from './routes/notes.js';
+import User from './routes/user.js';
 
 dotenv.config();
 
@@ -13,6 +14,7 @@ const app = express();
 app.use(express.json());
 
 app.use('/notes', router);
+app.use('/user', User);
 
 // conmnect to dbg and start thge server
 

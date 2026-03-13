@@ -23,6 +23,6 @@ const noteSchema = new Schema<Inote>(
   { timestamps: true },
 );
 
-const noteModel = model<Inote>('Notes', noteSchema);
+const noteModel = model<Inote>("Notes", noteSchema);
 
 export default noteModel;
