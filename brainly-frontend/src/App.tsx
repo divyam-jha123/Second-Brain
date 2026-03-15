@@ -6,13 +6,11 @@ export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Protected dashboard */}
         <Route
           path="/"
           element={<ProtectedDashboard />}
         />
 
-        {/* Clerk sign-in page */}
         <Route
           path="/sign-in/*"
           element={
@@ -22,7 +20,6 @@ export default function App() {
           }
         />
 
-        {/* Clerk sign-up page */}
         <Route
           path="/sign-up/*"
           element={
@@ -32,7 +29,6 @@ export default function App() {
           }
         />
 
-        {/* Fallback */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>

@@ -6,7 +6,7 @@ import App from './App.tsx'
 import { CLERK_PUBLISHABLE_KEY } from './config.ts'
 
 if (!CLERK_PUBLISHABLE_KEY) {
-  throw new Error('Missing VITE_CLERK_PUBLISHABLE_KEY in environment variables')
+  throw new Error('Missing CLERK_PUBLISHABLE_KEY in environment variables')
 }
 
 createRoot(document.getElementById('root')!).render(

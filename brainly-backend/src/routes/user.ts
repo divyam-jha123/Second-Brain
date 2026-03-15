@@ -43,34 +43,4 @@ router.post("/sync", requireAuth(), async (req: Request, res: Response) => {
   }
 });
 
-// Get current user (protected route)
-router.get("/me", requireAuth(), async (req: Request, res: Response) => {
-  try {
-    const { userId } = getAuth(req);
-
-    if (!userId) {
-      return res.status(401).json({
-        msg: "User not authenticated",
-      });
-    }
-
-    const user = await User.findOne({ clerkUserId: userId });
-
-    if (!user) {
-      return res.status(404).json({
-        msg: "User not found",
-      });
-    }
-
-    return res.json({
-      user,
-    });
-  } catch (error) {
-    return res.status(500).json({
-      msg: "Error fetching user",
-      error,
-    });
-  }
-});
-
 export default router;
