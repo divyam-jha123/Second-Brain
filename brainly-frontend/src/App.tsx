@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { RedirectToSignIn, SignIn, SignUp, useAuth } from '@clerk/react';
 import { Dashboard } from './components/dashboard';
+import { SharedDashboard } from './components/sharedDashboard';
 
 export default function App() {
   return (
@@ -28,6 +29,8 @@ export default function App() {
             </div>
           }
         />
+
+        <Route path="/share/:hash" element={<SharedDashboard />} />
 
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

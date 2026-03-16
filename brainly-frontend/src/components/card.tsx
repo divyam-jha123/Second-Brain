@@ -14,6 +14,9 @@ interface CardProps {
   contentList?: string[];
   tags: string[];
   addedDate: string;
+  onDelete?: () => void;
+  onShare?: () => void;
+  readOnly?: boolean; // hide action buttons on shared dashboard
 }
 
 const typeIcons: Record<CardType, React.ReactElement> = {
@@ -24,6 +27,8 @@ const typeIcons: Record<CardType, React.ReactElement> = {
 
 export const Card = (props: CardProps) => {
   const [isExpanded, setIsExpanded] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [shareCopied, setShareCopied] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -48,6 +53,24 @@ export const Card = (props: CardProps) => {
       document.body.style.overflow = "";
     };
   }, [isExpanded]);
+
+  const handleDelete = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!props.onDelete) return;
+    setIsDeleting(true);
+    await props.onDelete();
+    setIsDeleting(false);
+  };
+
+  const handleShare = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (props.content) {
+      navigator.clipboard.writeText(props.content);
+    }
+    setShareCopied(true);
+    setTimeout(() => setShareCopied(false), 2000);
+    props.onShare?.();
+  };
 
   const renderMedia = () => (
     <>
@@ -77,6 +100,13 @@ export const Card = (props: CardProps) => {
 
   return (
     <>
+      {/* Copied toast */}
+      {shareCopied && (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[60] bg-gray-900 text-white text-sm px-4 py-2.5 rounded-full shadow-lg animate-scaleIn">
+          ✓ Link copied to clipboard
+        </div>
+      )}
+
       {/* Preview Card */}
       <div
         ref={cardRef}
@@ -91,20 +121,34 @@ export const Card = (props: CardProps) => {
               {props.title}
             </h3>
           </div>
-          <div className="flex items-center gap-2 shrink-0">
-            <button
-              className="text-gray-400 hover:text-gray-600 cursor-pointer transition-colors"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <ShareIcon size="sm" />
-            </button>
-            <button
-              className="text-gray-400 hover:text-gray-600 cursor-pointer transition-colors"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <DeleteIcon size="sm" />
-            </button>
-          </div>
+          {!props.readOnly && (
+            <div className="flex items-center gap-2 shrink-0">
+              {/* Share button */}
+              <button
+                title="Copy link"
+                className="text-gray-400 hover:text-indigo-600 cursor-pointer transition-colors"
+                onClick={handleShare}
+              >
+                <ShareIcon size="sm" />
+              </button>
+              {/* Delete button */}
+              <button
+                title="Delete"
+                disabled={isDeleting}
+                className="text-gray-400 hover:text-red-500 disabled:opacity-50 cursor-pointer transition-colors"
+                onClick={handleDelete}
+              >
+                {isDeleting ? (
+                  <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                  </svg>
+                ) : (
+                  <DeleteIcon size="sm" />
+                )}
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Truncated Content */}
@@ -147,10 +191,29 @@ export const Card = (props: CardProps) => {
               <CrossIcon />
             </button>
 
-            {/* Header */}
+            {/* Header with action buttons */}
             <div className="flex items-start gap-2 pr-8">
               <span className="text-gray-500 mt-0.5 shrink-0">{typeIcons[props.type]}</span>
-              <h3 className="text-lg font-bold text-gray-900">{props.title}</h3>
+              <h3 className="text-lg font-bold text-gray-900 flex-1">{props.title}</h3>
+              {!props.readOnly && (
+                <div className="flex gap-2 items-center shrink-0 mr-6">
+                  <button
+                    title="Copy link"
+                    onClick={handleShare}
+                    className="p-1.5 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors cursor-pointer"
+                  >
+                    <ShareIcon size="sm" />
+                  </button>
+                  <button
+                    title="Delete"
+                    disabled={isDeleting}
+                    onClick={handleDelete}
+                    className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 disabled:opacity-50 rounded-lg transition-colors cursor-pointer"
+                  >
+                    <DeleteIcon size="sm" />
+                  </button>
+                </div>
+              )}
             </div>
 
             {/* Tags */}

@@ -90,40 +90,34 @@ router.delete("/:id", requireAuth(), async (req: Request, res: Response) => {
   }
 });
 
-router.post("/api/share", requireAuth(), async (req: Request, res: Response) => {
-  // generate and store sharable link -> seperate for every user
+router.post("/share", requireAuth(), async (req: Request, res: Response) => {
   const share = req.body.share;
   const { userId } = getAuth(req);
 
-  const existingLink = await Links.findOne({
-    userId: userId,
-  });
-
-  if (existingLink) {
-    res.json({
-      msg: "Link already exists",
-      link: existingLink,
-    });
-
-    return;
-  }
-  const hash = generateRandom(userId as unknown as number);
   if (share) {
-    // generate a sharable link
-    await Links.create({
-      userId: userId,
-      hash: hash,
+    // Check if a link already exists for this user
+    const existingLink = await Links.findOne({ userId });
+
+    if (existingLink) {
+      return res.json({
+        msg: "Link already exists",
+        hash: existingLink.hash,
+      });
+    }
+
+    const hash = generateRandom(10);
+    await Links.create({ userId, hash });
+
+    return res.json({
+      msg: "Sharable link generated",
+      hash,
     });
   } else {
-    await Links.deleteOne({
-      userId: userId,
-      hash: hash,
+    await Links.deleteOne({ userId });
+    return res.json({
+      msg: "Share link removed",
     });
   }
-
-  return res.json({
-    msg: "sharable link generated",
-  });
 });
 
 router.get('/api/share/:hash', async (req: Request, res: Response) => {
@@ -137,14 +131,13 @@ router.get('/api/share/:hash', async (req: Request, res: Response) => {
     });
   }
 
-  // get content
-  const content = await Notes.findOne({
+  // Get ALL notes for this user
+  const content = await Notes.find({
     userId: link.userId
   });
 
   return res.json({
     msg: "Link found",
-    link,
     content,
   });
 });

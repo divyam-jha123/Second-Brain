@@ -6,11 +6,13 @@ import { Card } from "./card";
 import { PlusIcon } from "../icons/plus";
 import { ShareIcon } from "../icons/shareIcon";
 import { CreateModal } from "../components/createModal";
+import { ShareModal } from "../components/shareModal";
 import { useState, useEffect, useCallback } from "react";
 import { API_URL } from "../config";
 
 export const Dashboard = () => {
   const [isModalOpen, setModalOpen] = useState(false);
+  const [isShareModalOpen, setShareModalOpen] = useState(false);
   const [notes, setNotes] = useState<any[]>([]);
   const { getToken } = useAuth();
   const { user } = useUser();
@@ -50,6 +52,20 @@ export const Dashboard = () => {
     }
   };
 
+  const deleteNote = async (id: string) => {
+    try {
+      const token = await getToken();
+      await axios.delete(`${API_URL}/notes/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      getData();
+    } catch (error) {
+      console.error("Error deleting note:", error);
+    }
+  };
+
   const SyncUser = async () => {
     try {
       const token = await getToken();
@@ -79,6 +95,11 @@ export const Dashboard = () => {
           setModalOpen(false);
         }}
       />
+      <ShareModal
+        isOpen={isShareModalOpen}
+        onClose={() => setShareModalOpen(false)}
+        itemCount={notes.length}
+      />
 
       {/* Content */}
       <div className="ml-64 flex-1 p-8">
@@ -91,7 +112,7 @@ export const Dashboard = () => {
               size="md"
               text="Share Brain"
               startIcon={<ShareIcon size="sm" />}
-              onClick={() => alert("Share Brain clicked")}
+              onClick={() => setShareModalOpen(true)}
             />
             <Button
               varient="primary"
@@ -113,6 +134,8 @@ export const Dashboard = () => {
               content={note.content}
               tags={["content"]}
               addedDate={new Date(note.createdAt).toLocaleDateString()}
+              onDelete={() => deleteNote(note._id)}
+              onShare={() => navigator.clipboard.writeText(note.content)}
             />
           ))}
         </div>

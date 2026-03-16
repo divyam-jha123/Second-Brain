@@ -1,6 +1,6 @@
 
 
-export const generateRandom = (len: number) => {
+export const generateRandom = (len: number = 10) => {
     let options = "estrdtfygkhjlkdohnouqjlco345768798gibxib908uh";
     let ans = "";
 
