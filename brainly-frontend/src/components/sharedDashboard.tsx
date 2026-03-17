@@ -49,7 +49,7 @@ export const SharedDashboard = () => {
             href="/"
             className="inline-block px-5 py-2.5 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 transition-colors"
           >
-            Go to Second Brain
+            Go to Brain Expo
           </a>
         </div>
       </div>

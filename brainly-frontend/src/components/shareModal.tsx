@@ -66,7 +66,7 @@ export const ShareModal = ({ isOpen, onClose, itemCount }: ShareModalProps) => {
         {/* Header */}
         <div className="flex items-center justify-between p-5 pb-0">
           <h2 className="text-xl font-bold text-gray-900">
-            Share Your Second Brain
+            Share Your Brain Expo
           </h2>
           <button
             onClick={handleClose}
@@ -81,7 +81,7 @@ export const ShareModal = ({ isOpen, onClose, itemCount }: ShareModalProps) => {
           <p className="text-gray-600 text-sm leading-relaxed">
             Share your entire collection of notes, documents, tweets, and videos
             with others. They'll be able to import your content into their own
-            Second Brain.
+            Brain Expo.
           </p>
 
           {!shareLink ? (

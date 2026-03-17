@@ -37,7 +37,7 @@ export const Sidebar = ({ activeFilter = "all", onFilterChange }: SidebarProps) 
         <span className="text-purple-600">
           <BrainIcon size="lg" />
         </span>
-        <h1 className="text-xl font-bold text-gray-900">Second Brain</h1>
+        <h1 className="text-xl font-bold text-gray-900">Brain Expo</h1>
       </div>
 
       <nav className="flex flex-col gap-1 px-3 mt-2 flex-1">

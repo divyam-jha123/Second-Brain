@@ -143,7 +143,7 @@ export const Dashboard = () => {
             <span className="text-purple-600 bg-purple-100 rounded-xl p-1.5 flex items-center justify-center">
               <BrainIcon size="lg" />
             </span>
-            <h1 className="text-xl font-bold text-gray-900 tracking-tight">Second Brain</h1>
+            <h1 className="text-xl font-bold text-gray-900 tracking-tight">Brain Expo</h1>
           </div>
           <div className="flex shrink-0 p-1 bg-purple-50 rounded-full">
             <UserButton />

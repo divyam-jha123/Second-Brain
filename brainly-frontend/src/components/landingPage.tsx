@@ -14,7 +14,7 @@ export const LandingPage = () => {
             <span className="text-purple-600">
               <BrainIcon size="lg" />
             </span>
-            <span className="text-xl font-bold text-gray-900">Second Brain</span>
+            <span className="text-xl font-bold text-gray-900">Brain Expo</span>
           </div>
 
           
@@ -143,11 +143,11 @@ export const LandingPage = () => {
                 <div className="w-3 h-3 rounded-full bg-red-400" />
                 <div className="w-3 h-3 rounded-full bg-yellow-400" />
                 <div className="w-3 h-3 rounded-full bg-green-400" />
-                <span className="ml-3 text-xs text-gray-400">secondbrain.app</span>
+                <span className="ml-3 text-xs text-gray-400">brainexpo.me</span>
               </div>
               <img
                 src="/dashboard-preview.png"
-                alt="Second Brain Dashboard"
+                alt="Brain Expo Dashboard"
                 className="w-full h-auto max-w-full"/* CHANGED: avoid overflow + keep responsive */
               />
             </div>
@@ -179,7 +179,7 @@ export const LandingPage = () => {
               Everything you need to stay sharp
             </h2>
             <p className="text-lg text-gray-500 max-w-xl mx-auto">
-              Stop juggling tabs. Second Brain brings your digital life into a single,
+              Stop juggling tabs. Brain Expo brings your digital life into a single,
               searchable interface.
             </p>
           </div>
@@ -275,7 +275,7 @@ export const LandingPage = () => {
                       </svg>
                     </div>
                     <div>
-                      <p className="font-semibold text-gray-900 text-sm">How to Build a Second Brain</p>
+                      <p className="font-semibold text-gray-900 text-sm">How to Build a Brain Expo</p>
                       <p className="text-xs text-gray-400">YouTube • 1.2M views</p>
                     </div>
                   </div>
@@ -316,7 +316,7 @@ export const LandingPage = () => {
         </div>
         <div className="relative max-w-3xl mx-auto px-6 text-center">
           <h2 className="text-4xl md:text-5xl font-extrabold text-white mb-6 leading-tight">
-            Start building your Second Brain today.
+            Start building your Brain Expo today.
           </h2>
           <p className="text-purple-200 text-lg mb-10 max-w-xl mx-auto">
             Join over 50+ million professionals who simplify work and life with the
@@ -345,7 +345,7 @@ export const LandingPage = () => {
                 <span className="text-purple-400">
                   <BrainIcon size="md" />
                 </span>
-                <span className="text-white font-bold">Second Brain</span>
+                <span className="text-white font-bold">Brain Expo</span>
               </div>
               <p className="text-sm leading-relaxed">
                 The all-in-one tool for your digital discoveries. Save, organize, and share
@@ -399,7 +399,7 @@ export const LandingPage = () => {
           </div>
 
           <div className="border-t border-gray-800 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
-            <p className="text-xs">© 2024 Second Brain Inc. All rights reserved.</p>
+            <p className="text-xs">© 2024 Brain Expo Inc. All rights reserved.</p>
             <div className="flex gap-6 text-xs">
               <a href="#" className="hover:text-white transition-colors">Terms of Service</a>
               <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
