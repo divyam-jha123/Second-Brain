@@ -26,8 +26,9 @@ export function createApp() {
       origin: (origin, cb) => {
         if (!origin) return cb(null, true);
         if (allowlist.includes(origin)) return cb(null, true);
-        return cb(null, false);
+        return cb(new Error("Not allowed by CORS"));
       },
+      credentials: true,
     }),
   );
   app.use(clerkMiddleware());
