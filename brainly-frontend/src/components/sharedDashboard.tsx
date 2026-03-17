@@ -5,10 +5,11 @@ import { Card } from "./card";
 import { API_URL } from "../config";
 import { BrainIcon } from "../icons/brainIcon";
 import { Loader } from "../icons/loader";
+import {type Note} from "./dashboard";
 
 export const SharedDashboard = () => {
   const { hash } = useParams<{ hash: string }>();
-  const [notes, setNotes] = useState<any[]>([]);
+  const [notes, setNotes] = useState<Note[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -17,8 +18,8 @@ export const SharedDashboard = () => {
       try {
         const response = await axios.get(`${API_URL}/notes/api/share/${hash}`);
         setNotes(response.data.content || []);
-      } catch (err: any) {
-        if (err.response?.status === 404) {
+      } catch (err: unknown) {
+        if (axios.isAxiosError(err) && err.response?.status === 404) {
           setError("This shared brain link is invalid or has been removed.");
         } else {
           setError("Something went wrong. Please try again later.");

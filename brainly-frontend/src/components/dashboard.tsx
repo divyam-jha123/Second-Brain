@@ -16,10 +16,22 @@ import { BrainIcon } from "../icons/brainIcon";
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { API_URL } from "../config";
 
+export type Note = {
+  _id: string;
+  title: string;
+  content?: string;
+  createdAt: string;
+};
+
+type CreateNotePayload = {
+  title: string;
+  link: string;
+};
+
 export const Dashboard = () => {
   const [isModalOpen, setModalOpen] = useState(false);
   const [isShareModalOpen, setShareModalOpen] = useState(false);
-  const [notes, setNotes] = useState<any[]>([]);
+  const [notes, setNotes] = useState<Note[]>([]);
   const [activeFilter, setActiveFilter] = useState<ContentFilter>("all");
   const { getToken } = useAuth();
   const { user } = useUser();
@@ -50,15 +62,16 @@ export const Dashboard = () => {
   }, [getToken]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     getData();
   }, [getData]);
 
-  const createNote = async (data: any) => {
+  const createNote = async (data: CreateNotePayload) => {
     try {
       const token = await getToken();
       await axios.post(`${API_URL}/notes/create-note`, {
         title: data.title,
-        link: data.link
+        link: data.link,
       }, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -203,7 +216,10 @@ export const Dashboard = () => {
                 tags={["content"]}
                 addedDate={new Date(note.createdAt).toLocaleDateString()}
                 onDelete={() => deleteNote(note._id)}
-                onShare={() => navigator.clipboard.writeText(note.content)}
+                onShare={() => {
+                  if (!note.content) return;
+                  navigator.clipboard.writeText(note.content);
+                }}
               />
             ))
           )}

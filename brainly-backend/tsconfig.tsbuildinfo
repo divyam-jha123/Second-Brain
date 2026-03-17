@@ -1,1 +1,1 @@
-{"root":["./src/index.ts","./src/middlewares/auth.ts","./src/models/notes.ts","./src/models/user.ts","./src/routes/notes.ts","./src/routes/user.ts","./src/utils/util.ts"],"version":"5.9.3"}
+{"root":["./src/app.ts","./src/index.ts","./src/middlewares/auth.ts","./src/models/notes.ts","./src/models/user.ts","./src/routes/notes.ts","./src/routes/user.ts","./src/utils/util.ts"],"version":"5.9.3"}

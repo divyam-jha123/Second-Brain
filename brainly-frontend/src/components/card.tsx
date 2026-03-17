@@ -6,6 +6,16 @@ import { VideoIcon } from "../icons/videoIcon";
 import { CrossIcon } from "../icons/crossicon";
 import { useEffect, useState, useRef } from "react";
 
+declare global {
+  interface Window {
+    twttr?: {
+      widgets: {
+        load: () => void;
+      };
+    };
+  }
+}
+
 type CardType = "document" | "tweet" | "video";
 interface CardProps {
   title: string;
@@ -32,9 +42,7 @@ export const Card = (props: CardProps) => {
   const cardRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // @ts-ignore
     if (window.twttr) {
-      // @ts-ignore
       window.twttr.widgets.load();
     }
   }, [props.content, props.type, isExpanded]);
@@ -102,7 +110,7 @@ export const Card = (props: CardProps) => {
     <>
       {/* Copied toast */}
       {shareCopied && (
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[60] bg-gray-900 text-white text-sm px-4 py-2.5 rounded-full shadow-lg animate-scaleIn">
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-60 bg-gray-900 text-white text-sm px-4 py-2.5 rounded-full shadow-lg animate-scaleIn">
           ✓ Link copied to clipboard
         </div>
       )}

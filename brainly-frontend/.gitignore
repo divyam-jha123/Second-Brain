@@ -12,6 +12,7 @@ dist
 dist-ssr
 *.local
 .env
+coverage/
 
 # Compiled output
 vite.config.js

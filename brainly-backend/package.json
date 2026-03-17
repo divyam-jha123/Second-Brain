@@ -9,10 +9,19 @@
   "scripts": {
     "build": "tsc -b",
     "start": "nodemon dist/index.js",
-    "dev": "npm run build && npm run start"
+    "dev": "npm run build && npm run start",
+    "test": "vitest",
+    "test:ci": "vitest run --coverage",
+
+    "ci": "npm run build && npm run test:ci"
   },
   "devDependencies": {
-    "typescript": "^5.9.3"
+    "@types/supertest": "^7.2.0",
+    "@vitest/coverage-v8": "^4.1.0",
+    "mongodb-memory-server": "^11.0.1",
+    "supertest": "^7.2.2",
+    "typescript": "^5.9.3",
+    "vitest": "^4.1.0"
   },
   "dependencies": {
     "@clerk/express": "^2.0.4",
