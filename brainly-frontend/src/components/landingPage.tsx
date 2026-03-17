@@ -1,12 +1,15 @@
 import { Link } from "react-router-dom";
 import { BrainIcon } from "../icons/brainIcon";
+import { useState } from "react"; // CHANGED: toggle state for mobile menu
 
 export const LandingPage = () => {
+  const [isNavOpen, setIsNavOpen] = useState(false); // CHANGED: mobile header toggle
+
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white overflow-x-hidden">{/* CHANGED: prevent horizontal scroll on mobile */}
       {/* Navbar */}
       <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-100">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between">{/* CHANGED: keep row header; mobile menu below */}
           <div className="flex items-center gap-2.5">
             <span className="text-purple-600">
               <BrainIcon size="lg" />
@@ -14,24 +17,71 @@ export const LandingPage = () => {
             <span className="text-xl font-bold text-gray-900">Second Brain</span>
           </div>
 
-          <div className="hidden md:flex items-center gap-8">
+          
+
+          {/* Desktop nav (unchanged structure, just ensure hidden on mobile) */}
+          <div className="hidden md:flex items-center gap-8">{/* CHANGED: moved back to desktop-only */}
             <a href="#features" className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors">Features</a>
             <a href="#preview" className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors">Resources</a>
             <a href="#cta" className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors">Pricing</a>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3">{/* CHANGED: tighter gap on mobile */}
+            {/* Mobile toggle (header items go inside) */}
+            <button
+              type="button"
+              className="md:hidden inline-flex items-center justify-center rounded-lg border border-gray-200 bg-white px-3 py-2 text-gray-700 hover:bg-gray-50 active:scale-[0.99] transition min-h-[44px]" // CHANGED
+              aria-label={isNavOpen ? "Close navigation menu" : "Open navigation menu"}
+              aria-expanded={isNavOpen}
+              onClick={() => setIsNavOpen((v) => !v)}
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="h-5 w-5">
+                {isNavOpen ? (
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
+                ) : (
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+                )}
+              </svg>
+            </button>
+
+            {/* Desktop login */}
             <Link
               to="/sign-in"
-              className="text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors px-4 py-2"
+              className="hidden md:inline-flex text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors px-4 py-2"
             >
               Log in
             </Link>
+
+            {/* Keep "Get started" visible always */}
             <Link
               to="/sign-up"
-              className="text-sm font-medium text-white bg-purple-600 hover:bg-purple-700 px-5 py-2.5 rounded-lg transition-colors shadow-sm"
+              className="text-sm font-medium text-white bg-purple-600 hover:bg-purple-700 px-3 sm:px-3 py-2 rounded-lg transition-colors shadow-sm min-h-[44px] inline-flex items-center justify-center" /* CHANGED: touch target */
             >
               Start for free
+          </Link>
+            
+          </div>
+        </div>
+
+        {/* Mobile menu content (header things inside toggle, except get started) */}
+        <div className={`${isNavOpen ? "block" : "hidden"} md:hidden border-t border-gray-100 bg-white/90 backdrop-blur-md`}>{/* CHANGED */}
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex flex-col gap-1">
+            <a href="#features" className="rounded-xl px-4 py-3 text-base font-semibold text-gray-800 hover:bg-gray-50 active:bg-gray-100 transition" onClick={() => setIsNavOpen(false)}>
+              Features
+            </a>
+            <a href="#preview" className="rounded-xl px-4 py-3 text-base font-semibold text-gray-800 hover:bg-gray-50 active:bg-gray-100 transition" onClick={() => setIsNavOpen(false)}>
+              Resources
+            </a>
+            <a href="#cta" className="rounded-xl px-4 py-3 text-base font-semibold text-gray-800 hover:bg-gray-50 active:bg-gray-100 transition" onClick={() => setIsNavOpen(false)}>
+              Pricing
+            </a>
+
+            <Link
+              to="/sign-in"
+              className="rounded-xl px-4 py-3 text-base font-semibold text-gray-800 hover:bg-gray-50 active:bg-gray-100 transition"
+              onClick={() => setIsNavOpen(false)}
+            >
+              Log in
             </Link>
           </div>
         </div>
@@ -41,17 +91,17 @@ export const LandingPage = () => {
       <section className="relative overflow-hidden">
         {/* Gradient background */}
         <div className="absolute inset-0 bg-gradient-to-b from-purple-50/80 via-white to-white" />
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[600px] bg-purple-200/30 rounded-full blur-3xl" />
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[680px] sm:w-[800px] h-[520px] sm:h-[600px] bg-purple-200/30 rounded-full blur-3xl" />{/* CHANGED: scale background for small screens */}
 
-        <div className="relative max-w-7xl mx-auto px-6 pt-20 pb-16 text-center">
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 pt-14 sm:pt-20 pb-12 sm:pb-16 text-center">{/* CHANGED: mobile-first padding */}
           {/* Badge */}
-          <div className="inline-flex items-center gap-2 bg-purple-50 border border-purple-100 text-purple-700 text-xs font-semibold px-4 py-1.5 rounded-full mb-8">
+          <div className="inline-flex items-center gap-2 bg-purple-50 border border-purple-100 text-purple-700 text-[11px] sm:text-xs font-semibold px-3 sm:px-4 py-1.5 rounded-full mb-6 sm:mb-8">{/* CHANGED: smaller text + spacing on mobile */}
             <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse" />
             SAVE. ORGANIZE. SHARE. CAPTURE.
           </div>
 
           {/* Headline */}
-          <h1 className="text-5xl md:text-7xl font-extrabold text-gray-900 leading-tight tracking-tight mb-6">
+          <h1 className="text-4xl sm:text-5xl md:text-7xl font-extrabold text-gray-900 leading-tight tracking-tight mb-5 sm:mb-6">{/* CHANGED: mobile-first font size */}
             Your Internet.{" "}
             <span className="bg-gradient-to-r from-purple-600 to-violet-500 bg-clip-text text-transparent">
               Organized.
@@ -59,16 +109,16 @@ export const LandingPage = () => {
           </h1>
 
           {/* Subtitle */}
-          <p className="text-lg md:text-xl text-gray-500 max-w-2xl mx-auto mb-10 leading-relaxed">
+          <p className="text-base sm:text-lg md:text-xl text-gray-500 max-w-2xl mx-auto mb-8 sm:mb-10 leading-relaxed">{/* CHANGED: readable on 320px */}
             Save tweets, videos, documents, and links in one place. Build your
             personal knowledge hub and never lose a great idea again.
           </p>
 
           {/* CTA Buttons */}
-          <div className="flex items-center justify-center gap-4 mb-16">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3 sm:gap-4 mb-10 sm:mb-16">{/* CHANGED: stack CTAs on mobile */}
             <Link
               to="/sign-up"
-              className="inline-flex items-center gap-2 bg-purple-600 hover:bg-purple-700 text-white font-semibold text-base px-8 py-3.5 rounded-xl transition-all shadow-lg shadow-purple-200 hover:shadow-xl hover:shadow-purple-300 hover:-translate-y-0.5"
+              className="inline-flex items-center justify-center gap-2 bg-purple-600 hover:bg-purple-700 text-white font-semibold text-base px-6 sm:px-8 py-3.5 rounded-xl transition-all shadow-lg shadow-purple-200 hover:shadow-xl hover:shadow-purple-300 sm:hover:-translate-y-0.5 min-h-[48px]"/* CHANGED: touch target + responsive padding */
             >
               Start building for free
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
@@ -77,7 +127,7 @@ export const LandingPage = () => {
             </Link>
             <a
               href="#preview"
-              className="inline-flex items-center gap-2 text-gray-700 font-semibold text-base px-6 py-3.5 rounded-xl border border-gray-200 hover:border-gray-300 hover:bg-gray-50 transition-all"
+              className="inline-flex items-center justify-center gap-2 text-gray-700 font-semibold text-base px-6 py-3.5 rounded-xl border border-gray-200 hover:border-gray-300 hover:bg-gray-50 transition-all min-h-[48px]"/* CHANGED: touch target + centered */
             >
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.347a1.125 1.125 0 0 1 0 1.972l-11.54 6.347a1.125 1.125 0 0 1-1.667-.986V5.653Z" />
@@ -98,7 +148,7 @@ export const LandingPage = () => {
               <img
                 src="/dashboard-preview.png"
                 alt="Second Brain Dashboard"
-                className="w-full"
+                className="w-full h-auto max-w-full"/* CHANGED: avoid overflow + keep responsive */
               />
             </div>
           </div>

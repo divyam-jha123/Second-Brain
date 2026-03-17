@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useAuth, useUser } from "@clerk/react";
+import { useAuth, useUser, UserButton } from "@clerk/react";
 import { Button } from "./button";
 import { Sidebar } from "./sidebar";
 import type { ContentFilter } from "./sidebar";
@@ -8,6 +8,11 @@ import { PlusIcon } from "../icons/plus";
 import { ShareIcon } from "../icons/shareIcon";
 import { CreateModal } from "../components/createModal";
 import { ShareModal } from "../components/shareModal";
+import { TwitterIcon } from "../icons/twitterIcon";
+import { VideoIcon } from "../icons/videoIcon";
+import { DocumentIcon } from "../icons/documentIcon";
+import { TagIcon } from "../icons/tagIcon";
+import { BrainIcon } from "../icons/brainIcon";
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { API_URL } from "../config";
 
@@ -96,8 +101,10 @@ export const Dashboard = () => {
   }
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
-      <Sidebar activeFilter={activeFilter} onFilterChange={setActiveFilter} />
+    <div className="flex min-h-screen bg-gray-50 pb-[80px] md:pb-0 relative">
+      <div className="hidden md:block">
+        <Sidebar activeFilter={activeFilter} onFilterChange={setActiveFilter} />
+      </div>
       <CreateModal
         isOpen={isModalOpen}
         onClose={() => setModalOpen(false)}
@@ -115,44 +122,134 @@ export const Dashboard = () => {
       />
 
       {/* Content */}
-      <div className="ml-64 flex-1 p-8">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <h2 className="text-2xl font-bold text-gray-900">
-            {activeFilter === "all" ? "All Notes" : activeFilter === "tweet" ? "Tweets" : activeFilter === "video" ? "Videos" : "Documents"}
-          </h2>
-          <div className="flex gap-3">
-            <Button
-              varient="secondary"
-              size="md"
-              text="Share Brain"
-              startIcon={<ShareIcon size="sm" />}
-              onClick={() => setShareModalOpen(true)}
-            />
-            <Button
-              varient="primary"
-              size="md"
-              text="Add Content"
-              startIcon={<PlusIcon size="sm" />}
-              onClick={() => setModalOpen(true)}
-            />
+      <div className="md:ml-64 flex-1 p-4 md:p-8 w-full max-w-full overflow-x-hidden">
+        
+        {/* Mobile Header (Hidden on Desktop) */}
+        <div className="flex md:hidden items-center justify-between mb-8 pb-4 border-b border-gray-100">
+          <div className="flex items-center gap-2">
+            <span className="text-purple-600 bg-purple-100 rounded-xl p-1.5 flex items-center justify-center">
+              <BrainIcon size="lg" />
+            </span>
+            <h1 className="text-xl font-bold text-gray-900 tracking-tight">Second Brain</h1>
           </div>
+          <div className="flex shrink-0 p-1 bg-purple-50 rounded-full">
+            <UserButton />
+          </div>
+        </div>
+
+        {/* Section Header */}
+        <div className="flex items-center justify-between mb-4 md:mb-8">
+          <h2 className="text-2xl font-bold text-gray-900">
+            All Notes
+          </h2>
+          <div className="flex gap-2 md:gap-3">
+            <div className="bg-purple-50 text-purple-700 hover:bg-purple-100 flex items-center gap-1.5 px-3 py-1.5 md:px-4 md:py-2 rounded-lg cursor-pointer transition-colors text-sm font-medium" onClick={() => setShareModalOpen(true)}>
+              <ShareIcon size="sm" />
+              <span>Share Brain</span>
+            </div>
+            <div className="hidden md:block">
+              <Button
+                varient="primary"
+                size="md"
+                text="Add Content"
+                startIcon={<PlusIcon size="sm" />}
+                onClick={() => setModalOpen(true)}
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Mobile view headers */}
+        <div className="flex md:hidden gap-2 overflow-x-auto pb-4 mb-2 -mx-4 px-4 scrollbar-hide">
+          <button 
+            onClick={() => setActiveFilter("all")}
+            className={`whitespace-nowrap px-4 py-1.5 rounded-full text-sm font-medium border transition-colors ${activeFilter === "all" ? "bg-purple-600 text-white border-purple-600 shadow-sm" : "bg-white text-gray-600 border-gray-200"}`}
+          >
+            All
+          </button>
+          <button 
+            onClick={() => setActiveFilter("tweet")}
+            className={`whitespace-nowrap px-4 py-1.5 rounded-full text-sm font-medium border transition-colors ${activeFilter === "tweet" ? "bg-purple-600 text-white border-purple-600 shadow-sm" : "bg-white text-gray-600 border-gray-200"}`}
+          >
+            Tweets
+          </button>
+          <button 
+            onClick={() => setActiveFilter("video")}
+            className={`whitespace-nowrap px-4 py-1.5 rounded-full text-sm font-medium border transition-colors ${activeFilter === "video" ? "bg-purple-600 text-white border-purple-600 shadow-sm" : "bg-white text-gray-600 border-gray-200"}`}
+          >
+            Videos
+          </button>
+          <button 
+            onClick={() => setActiveFilter("document")}
+            className={`whitespace-nowrap px-4 py-1.5 rounded-full text-sm font-medium border transition-colors ${activeFilter === "document" ? "bg-purple-600 text-white border-purple-600 shadow-sm" : "bg-white text-gray-600 border-gray-200"}`}
+          >
+            Docs
+          </button>
         </div>
 
         {/* Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-          {filteredNotes.map((note) => (
-            <Card
-              key={note._id}
-              title={note.title}
-              type={getContentType(note.content)}
-              content={note.content}
-              tags={["content"]}
-              addedDate={new Date(note.createdAt).toLocaleDateString()}
-              onDelete={() => deleteNote(note._id)}
-              onShare={() => navigator.clipboard.writeText(note.content)}
-            />
-          ))}
+          {filteredNotes.length === 0 ? (
+            <div className="col-span-full py-10 text-center text-gray-500">
+              No notes found in this category.
+            </div>
+          ) : (
+            filteredNotes.map((note) => (
+              <Card
+                key={note._id}
+                title={note.title}
+                type={getContentType(note.content)}
+                content={note.content}
+                tags={["content"]}
+                addedDate={new Date(note.createdAt).toLocaleDateString()}
+                onDelete={() => deleteNote(note._id)}
+                onShare={() => navigator.clipboard.writeText(note.content)}
+              />
+            ))
+          )}
+        </div>
+      </div>
+
+      {/* Floating Action Button (FAB for Mobile) */}
+      <div className="md:hidden fixed bottom-24 right-6 z-40">
+        <button 
+          onClick={() => setModalOpen(true)}
+          className="bg-purple-600 text-white rounded-full p-4 shadow-lg hover:bg-purple-700 active:scale-95 transition-transform flex items-center justify-center h-14 w-14"
+        >
+          <div className="scale-125">
+            <PlusIcon size="md" />
+          </div>
+        </button>
+      </div>
+
+      {/* Mobile Bottom Navigation Component */}
+      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-6 py-2 pb-5 z-40 flex justify-between items-center shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+        <div 
+          onClick={() => setActiveFilter("tweet")}
+          className={`flex flex-col items-center gap-1 min-w-[64px] ${activeFilter === "tweet" ? "text-purple-600" : "text-gray-400"} cursor-pointer hover:text-purple-500 transition-colors`}
+        >
+          <TwitterIcon size="md" />
+          <span className="text-[10px] font-medium tracking-wide">Tweets</span>
+        </div>
+        <div 
+          onClick={() => setActiveFilter("video")}
+          className={`flex flex-col items-center gap-1 min-w-[64px] ${activeFilter === "video" ? "text-purple-600" : "text-gray-400"} cursor-pointer hover:text-purple-500 transition-colors`}
+        >
+          <VideoIcon size="md" />
+          <span className="text-[10px] font-medium tracking-wide">Videos</span>
+        </div>
+        <div 
+          onClick={() => setActiveFilter("document")}
+          className={`flex flex-col items-center gap-1 min-w-[64px] ${activeFilter === "document" ? "text-purple-600" : "text-gray-400"} cursor-pointer hover:text-purple-500 transition-colors`}
+        >
+          <DocumentIcon size="md" />
+          <span className="text-[10px] font-medium tracking-wide">Docs</span>
+        </div>
+        <div 
+          className="flex flex-col items-center gap-1 min-w-[64px] text-gray-400 cursor-pointer hover:text-purple-500 transition-colors"
+        >
+          <TagIcon size="md" />
+          <span className="text-[10px] font-medium tracking-wide">Tags</span>
         </div>
       </div>
     </div>
