@@ -27,8 +27,11 @@ export function createApp() {
     cors({
       origin: (origin, cb) => {
         if (!origin) return cb(null, true);
-        if (allowlist.includes(origin)) return cb(null, true);
-        return cb(new Error("Not allowed by CORS"));
+        if (allowlist.length === 0 || allowlist.includes(origin)) {
+          return cb(null, true);
+        }
+        // For now, don't hard-fail CORS; just deny the specific origin.
+        return cb(null, false);
       },
       credentials: true,
     }),
