@@ -12,7 +12,9 @@ export function createApp() {
     process.env.CORS_ORIGINS
       ? process.env.CORS_ORIGINS.split(",")
       : [
-
+          // production
+          "https://brainexpo.me",
+          "https://www.brainexpo.me",
           // local dev
           "http://localhost:5173",
           "http://localhost:3000",
