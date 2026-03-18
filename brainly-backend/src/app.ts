@@ -8,13 +8,11 @@ export function createApp() {
   const app = express();
 
   app.use(express.json());
-  app.options('*', cors());
 
 
   app.use(cors({
     origin: true,
     credentials: true,
-    allowedHeaders: ["Content-Type", "Authorization"],
   }))
 
   // const allowlist = (
