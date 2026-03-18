@@ -29,19 +29,5 @@ function testClerkMiddleware() {
 }
 
 export const clerkMiddleware = isTest ? testClerkMiddleware : realClerkMiddleware;
-export const requireAuth = isTest
-  ? testRequireAuth
-  : () => {
-      return (req: Request, res: Response, next: NextFunction) => {
-        try {
-          const auth = realGetAuth(req);
-          if (!auth || !auth.userId) {
-            return res.status(401).json({ msg: "Not authenticated" });
-          }
-          next();
-        } catch (error) {
-          return res.status(401).json({ msg: "Not authenticated", error });
-        }
-      };
-    };
+export const requireAuth = isTest ? testRequireAuth : realRequireAuth;
 export const getAuth = isTest ? testGetAuth : realGetAuth;
