@@ -3,6 +3,7 @@ import { render, screen, waitFor } from "@testing-library/react";
 import axios from "axios";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { SharedDashboard } from "../sharedDashboard";
+import { API_URL } from "../../config";
 
 vi.mock("axios");
 
@@ -34,6 +35,10 @@ describe("SharedDashboard", () => {
     );
 
     await waitFor(() => expect(screen.getByText("A")).toBeInTheDocument());
+    expect(axios.get).toHaveBeenCalledWith(
+      `${API_URL}/notes/api/share/abc`,
+      { withCredentials: true },
+    );
   });
 
   it("shows friendly message on 404", async () => {
@@ -54,6 +59,10 @@ describe("SharedDashboard", () => {
       expect(
         screen.getByText(/shared brain link is invalid/i),
       ).toBeInTheDocument(),
+    );
+    expect(axios.get).toHaveBeenCalledWith(
+      `${API_URL}/notes/api/share/missing`,
+      { withCredentials: true },
     );
   });
 });

@@ -4,16 +4,30 @@ import { clerkMiddleware } from "./middlewares/auth.js";
 import notesRouter from "./routes/notes.js";
 import userRouter from "./routes/user.js";
 
+
 export function createApp() {
   const app = express();
 
   app.use(express.json());
 
+  const allowlist = (
+    process.env.CORS_ORIGINS
+      ? process.env.CORS_ORIGINS.split(",")
+      : ["http://localhost:5173", "http://localhost:3000"]
+  )
+    .map((s) => s.trim())
+    .filter(Boolean);
 
-  app.use(cors({
-    origin: process.env.CORS_ORIGINS || "http://localhost:5173",
-    credentials: true,
-  }))
+  app.use(
+    cors({
+      origin: (origin, cb) => {
+        if (!origin) return cb(null, true);
+        if (allowlist.includes(origin)) return cb(null, true);
+        return cb(null, false);
+      },
+      credentials: true,
+    }),
+  );
 
   // const allowlist = (
   //   process.env.CORS_ORIGINS
