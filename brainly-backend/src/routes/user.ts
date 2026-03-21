@@ -1,6 +1,7 @@
 import { Router, Request, Response } from "express";
 import { requireAuth, getAuth } from "../middlewares/auth.js";
 import { User } from "../models/user.js";
+import { sendWelcomeEmail } from "../services/emailService.js";
 
 const router = Router();
 
@@ -23,11 +24,22 @@ router.post("/sync", requireAuth(), async (req: Request, res: Response) => {
       });
     }
 
+    // Check if this is a brand new user
+    const existingUser = await User.findOne({ clerkUserId: userId });
+    const isNewUser = !existingUser;
+
     const user = await User.findOneAndUpdate(
       { clerkUserId: userId },
       { clerkUserId: userId, username, email },
       { upsert: true, new: true }
     );
+
+    // Send welcome email only for first-time signups
+    if (isNewUser) {
+      sendWelcomeEmail(userId, email, username).catch((err) =>
+        console.error("Welcome email failed:", err),
+      );
+    }
 
     return res.status(200).json({
       msg: "User synced successfully",

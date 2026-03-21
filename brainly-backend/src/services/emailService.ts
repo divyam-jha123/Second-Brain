@@ -11,6 +11,10 @@ import {
   buildAnnouncementHtml,
   type AnnouncementData,
 } from "../emails/featureAnnouncement.js";
+import {
+  buildWelcomeHtml,
+  type WelcomeData,
+} from "../emails/welcome.js";
 
 // Lazy-init so tests don't crash when RESEND_API_KEY is absent
 let _resend: Resend | null = null;
@@ -199,4 +203,33 @@ export async function sendFeatureAnnouncement(params: {
   }
 
   return { sent, errors, skipped };
+}
+
+// ─── Welcome Email ──────────────────────────────────────────────────
+
+export async function sendWelcomeEmail(
+  userId: string,
+  email: string,
+  username: string,
+): Promise<void> {
+  const templateData: WelcomeData = {
+    username,
+    dashboardUrl: `${CORS_ORIGINS}/dashboard`,
+    unsubscribeUrl: generateUnsubscribeUrl(userId, email, "all"),
+  };
+
+  const html = buildWelcomeHtml(templateData);
+
+  const { error } = await getResend().emails.send({
+    from: EMAIL_FROM,
+    to: email,
+    subject: "🧠 Welcome to BrainExpo — Your second brain starts here!",
+    html,
+  });
+
+  if (error) {
+    console.error(`Failed to send welcome email to ${email}:`, error);
+  } else {
+    console.log(`Welcome email sent to ${email}`);
+  }
 }
