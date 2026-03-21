@@ -45,7 +45,7 @@ export function buildAnnouncementHtml(data: AnnouncementData): string {
         <tr>
           <td style="padding:8px 24px 16px;">
             <p style="margin:0;font-size:14px;color:#4b5563;line-height:1.6;">
-              ${escapeHtml(data.body)}
+              ${escapeHtml(data.body).replace(/\n/g, "<br/>")}
             </p>
           </td>
         </tr>

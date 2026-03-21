@@ -118,32 +118,49 @@ export async function sendFeatureAnnouncement(params: {
   body: string;
   ctaText?: string;
   ctaUrl?: string;
-}): Promise<{ sent: number; errors: number; details?: any }> {
-  const subscribers = await EmailPreference.find({
-    featureAnnouncements: true,
-    unsubscribedAll: false,
+}): Promise<{ sent: number; errors: number; skipped: number; details?: any }> {
+  // 1. Get ALL users from the database
+  const allUsers = await User.find({}).lean();
+
+  // 2. Get the explicit opt-out list (users who turned off announcements or unsubscribed)
+  const optedOut = await EmailPreference.find({
+    $or: [
+      { featureAnnouncements: false },
+      { unsubscribedAll: true },
+    ],
   }).lean();
+
+  const optedOutIds = new Set(optedOut.map((p) => p.clerkUserId));
 
   let sent = 0;
   let errors = 0;
+  let skipped = 0;
   let lastError = null;
 
-  for (const pref of subscribers) {
-    try {
-      // Look up the username
-      const user = await User.findOne({ clerkUserId: pref.clerkUserId }).lean();
-      const username = user?.username || "there";
+  for (const user of allUsers) {
+    // Skip users who explicitly unsubscribed
+    if (optedOutIds.has(user.clerkUserId)) {
+      skipped++;
+      continue;
+    }
 
+    // Skip users without an email address
+    if (!user.email) {
+      skipped++;
+      continue;
+    }
+
+    try {
       const templateData: AnnouncementData = {
-        username,
+        username: user.username || "there",
         subject: params.subject,
         title: params.title,
         body: params.body,
         ctaText: params.ctaText,
         ctaUrl: params.ctaUrl,
         unsubscribeUrl: generateUnsubscribeUrl(
-          pref.clerkUserId,
-          pref.email,
+          user.clerkUserId,
+          user.email,
           "announcements",
         ),
       };
@@ -152,14 +169,14 @@ export async function sendFeatureAnnouncement(params: {
 
       const { error } = await getResend().emails.send({
         from: FROM_EMAIL,
-        to: pref.email,
+        to: user.email,
         subject: params.subject,
         html,
       });
 
       if (error) {
         console.error(
-          `Failed to send announcement to ${pref.email}:`,
+          `Failed to send announcement to ${user.email}:`,
           error,
         );
         errors++;
@@ -169,7 +186,7 @@ export async function sendFeatureAnnouncement(params: {
       }
     } catch (err) {
       console.error(
-        `Failed to process announcement for ${pref.email}:`,
+        `Failed to process announcement for ${user.email}:`,
         err,
       );
       errors++;
@@ -177,9 +194,9 @@ export async function sendFeatureAnnouncement(params: {
     }
   }
 
-  if (errors > 0 && sent === 0) {
+  if (errors > 0 && sent === 0 && allUsers.length > 0) {
     throw new Error((lastError as any)?.message || "Failed to send all emails");
   }
 
-  return { sent, errors };
+  return { sent, errors, skipped };
 }
