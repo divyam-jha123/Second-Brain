@@ -21,7 +21,7 @@ function getResend(): Resend {
   return _resend;
 }
 
-const FROM_EMAIL = process.env.FROM_EMAIL || "BrainExpo <onboarding@resend.dev>";
+const EMAIL_FROM = process.env.EMAIL_FROM || "BrainExpo <onboarding@resend.dev>";
 const CORS_ORIGINS = process.env.CORS_ORIGINS || "http://localhost:5173";
 const UNSUBSCRIBE_SECRET = process.env.UNSUBSCRIBE_SECRET || "default-secret";
 
@@ -94,7 +94,7 @@ export async function sendWeeklyDigest(
   const html = buildWeeklyDigestHtml(templateData);
 
   const { error } = await getResend().emails.send({
-    from: FROM_EMAIL,
+    from: EMAIL_FROM,
     to: email,
     subject: `🧠 Your Weekly Brain Digest — ${recentNotes.length} note${recentNotes.length !== 1 ? "s" : ""} saved`,
     html,
@@ -168,7 +168,7 @@ export async function sendFeatureAnnouncement(params: {
       const html = buildAnnouncementHtml(templateData);
 
       const { error } = await getResend().emails.send({
-        from: FROM_EMAIL,
+        from: EMAIL_FROM,
         to: user.email,
         subject: params.subject,
         html,
