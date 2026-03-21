@@ -22,7 +22,7 @@ function getResend(): Resend {
 }
 
 const FROM_EMAIL = process.env.FROM_EMAIL || "BrainExpo <onboarding@resend.dev>";
-const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:5173";
+const CORS_ORIGINS = process.env.CORS_ORIGINS || "http://localhost:5173";
 const UNSUBSCRIBE_SECRET = process.env.UNSUBSCRIBE_SECRET || "default-secret";
 
 // ─── Unsubscribe URL ────────────────────────────────────────────────
@@ -55,7 +55,7 @@ export function generateUnsubscribeUrl(
   type: "all" | "digest" | "announcements",
 ): string {
   const token = generateUnsubscribeToken(userId, email, type);
-  return `${FRONTEND_URL}/unsubscribe?token=${encodeURIComponent(token)}&type=${type}`;
+  return `${CORS_ORIGINS}/unsubscribe?token=${encodeURIComponent(token)}&type=${type}`;
 }
 
 // ─── Weekly Digest ──────────────────────────────────────────────────
@@ -88,7 +88,7 @@ export async function sendWeeklyDigest(
       }),
     })),
     unsubscribeUrl: generateUnsubscribeUrl(userId, email, "digest"),
-    dashboardUrl: `${FRONTEND_URL}/dashboard`,
+    dashboardUrl: `${CORS_ORIGINS}/dashboard`,
   };
 
   const html = buildWeeklyDigestHtml(templateData);
