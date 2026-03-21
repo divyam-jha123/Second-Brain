@@ -16,6 +16,10 @@ vi.mock("../src/models/user.js", () => {
       if (query.clerkUserId) return usersStore.filter((u) => u.clerkUserId === query.clerkUserId);
       return [...usersStore];
     },
+    findOne: async (query: Partial<Pick<UserDoc, "clerkUserId">>) => {
+      if (query.clerkUserId) return usersStore.find((u) => u.clerkUserId === query.clerkUserId) || null;
+      return usersStore[0] || null;
+    },
     findOneAndUpdate: async (
       query: Partial<Pick<UserDoc, "clerkUserId">>,
       update: Partial<UserDoc>,
