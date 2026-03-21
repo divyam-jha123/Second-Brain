@@ -6,8 +6,10 @@ import { DocumentIcon } from "../icons/documentIcon";
 import { LinkIcon } from "../icons/linkIcon";
 import { TagIcon } from "../icons/tagIcon";
 import { UserButton } from "@clerk/react";
+import { useNavigate, useLocation } from "react-router-dom";
+import { SettingIcon } from "../icons/settingIcon";
 
-export type ContentFilter = "all" | "tweet" | "video" | "document";
+export type ContentFilter = "all" | "tweet" | "video" | "document" | "settings";
 
 interface SidebarProps {
   activeFilter?: ContentFilter;
@@ -15,7 +17,13 @@ interface SidebarProps {
 }
 
 export const Sidebar = ({ activeFilter = "all", onFilterChange }: SidebarProps) => {
+  const navigate = useNavigate();
+  const location = useLocation();
+
   const handleClick = (filter: ContentFilter) => {
+    if (location.pathname !== "/dashboard") {
+      navigate("/dashboard");
+    }
     // Toggle: clicking the active filter resets to "all"
     if (activeFilter === filter) {
       onFilterChange?.("all"); 
@@ -66,6 +74,12 @@ export const Sidebar = ({ activeFilter = "all", onFilterChange }: SidebarProps) 
         <SidebarItem
           text="Tags"
           icon={<TagIcon size="md" />}
+        />
+        <SidebarItem
+          text="Settings"
+          icon={<SettingIcon size="md" />}
+          isActive={location.pathname === "/settings"}
+          onClick={() => navigate("/settings")}
         />
       </nav>
 

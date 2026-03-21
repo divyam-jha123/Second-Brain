@@ -15,6 +15,7 @@ import { TagIcon } from "../icons/tagIcon";
 import { BrainIcon } from "../icons/brainIcon";
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { API_URL } from "../config";
+import { ExtensionBanner } from "./ExtensionBanner";
 
 export type Note = {
   _id: string;
@@ -152,6 +153,7 @@ export const Dashboard = () => {
 
       {/* Content */}
       <div className="md:ml-64 flex-1 p-4 md:p-8 w-full max-w-full overflow-x-hidden">
+        <ExtensionBanner />
         
         {/* Mobile Header (Hidden on Desktop) */}
         <div className="flex md:hidden items-center justify-between mb-8 pb-4 border-b border-gray-100">

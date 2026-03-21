@@ -1,0 +1,18 @@
+{
+  "manifest_version": 3,
+  "name": "Brain Expo Saver",
+  "description": "Save the current tab's title and URL to Brain Expo.",
+  "version": "1.0.0",
+  "action": {
+    "default_popup": "index.html",
+    "default_title": "Save to Brain Expo"
+  },
+  "permissions": ["activeTab", "storage", "tabs"],
+  "host_permissions": ["https://second-brain-miuh.onrender.com/*"],
+  "icons": {
+    "16": "favicon.svg",
+    "48": "favicon.svg",
+    "128": "favicon.svg"
+  }
+}
+

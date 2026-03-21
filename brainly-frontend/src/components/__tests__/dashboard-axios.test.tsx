@@ -3,6 +3,7 @@ import { render, screen, waitFor } from "@testing-library/react";
 import axios from "axios";
 import { Dashboard } from "../dashboard";
 import { API_URL } from "../../config";
+import { MemoryRouter } from "react-router-dom";
 
 vi.mock("axios");
 
@@ -23,7 +24,11 @@ describe("Dashboard axios connectivity", () => {
   it("calls GET /notes with Bearer token on mount", async () => {
     vi.mocked(axios.get).mockResolvedValueOnce({ data: { post: [] } });
 
-    render(<Dashboard />);
+    render(
+    <MemoryRouter>
+      <Dashboard />
+    </MemoryRouter>
+    );
 
     await waitFor(() =>
       expect(axios.get).toHaveBeenCalledWith(`${API_URL}/notes`, {
