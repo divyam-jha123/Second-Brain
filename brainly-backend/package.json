@@ -12,10 +12,11 @@
     "dev": "npm run build && npm run start",
     "test": "vitest",
     "test:ci": "vitest run --coverage",
-
     "ci": "npm run build && npm run test:ci"
   },
   "devDependencies": {
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/node-cron": "^3.0.11",
     "@types/supertest": "^7.2.0",
     "@vitest/coverage-v8": "^4.1.0",
     "mongodb-memory-server": "^11.0.1",
@@ -30,8 +31,11 @@
     "cors": "^2.8.6",
     "dotenv": "^17.3.1",
     "express": "^5.2.1",
+    "jsonwebtoken": "^9.0.3",
     "mongoose": "^9.3.0",
+    "node-cron": "^4.2.1",
     "nodemon": "^3.1.14",
+    "resend": "^6.9.4",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3"
   }

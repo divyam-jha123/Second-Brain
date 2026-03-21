@@ -1,6 +1,10 @@
 import { useExtensionBridge } from "../hooks/useExtensionBridge";
 import type { ExtensionStatus } from "../hooks/useExtensionBridge";
 import { Sidebar } from "../components/sidebar";
+import { useState, useEffect, useCallback } from "react";
+import { useAuth, useUser } from "@clerk/react";
+import axios from "axios";
+import { API_URL } from "../config";
 
 // const CHROME_STORE_URL =
 //   "https://chromewebstore.google.com/detail/brainexpo/YOUR_EXTENSION_ID";
@@ -27,6 +31,14 @@ export function Settings() {
               opening the app.
             </p>
             <ExtensionCard status={status} />
+          </section>
+
+          <section className="settings-section">
+            <h2>Email Notifications</h2>
+            <p className="settings-section__desc">
+              Choose which emails you'd like to receive from BrainExpo.
+            </p>
+            <EmailPreferencesCard />
           </section>
         </div>
       </div>
@@ -129,3 +141,158 @@ function ExtensionCard({ status }: { status: ExtensionStatus }) {
   );
 }
 
+function EmailPreferencesCard() {
+  const { getToken } = useAuth();
+  const { user } = useUser();
+  const [featureAnnouncements, setFeatureAnnouncements] = useState(true);
+  const [weeklyDigest, setWeeklyDigest] = useState(true);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+
+  const fetchPreferences = useCallback(async () => {
+    try {
+      const token = await getToken();
+      const res = await axios.get(`${API_URL}/email/preferences`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const prefs = res.data.preferences;
+      setFeatureAnnouncements(prefs.featureAnnouncements);
+      setWeeklyDigest(prefs.weeklyDigest);
+    } catch (err) {
+      console.error("Failed to fetch email preferences:", err);
+    } finally {
+      setLoading(false);
+    }
+  }, [getToken]);
+
+  useEffect(() => {
+    fetchPreferences();
+  }, [fetchPreferences]);
+
+  const updatePreference = async (
+    key: "featureAnnouncements" | "weeklyDigest",
+    value: boolean,
+  ) => {
+    setSaving(true);
+    try {
+      const token = await getToken();
+      const email = user?.primaryEmailAddress?.emailAddress || user?.emailAddresses?.[0]?.emailAddress;
+
+      await axios.put(
+        `${API_URL}/email/preferences`,
+        { [key]: value, email },
+        { headers: { Authorization: `Bearer ${token}` } },
+      );
+
+      if (key === "featureAnnouncements") setFeatureAnnouncements(value);
+      if (key === "weeklyDigest") setWeeklyDigest(value);
+    } catch (err) {
+      console.error("Failed to update preference:", err);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="ext-card">
+        <div className="ext-card__body">
+          <p className="ext-card__desc">Loading email preferences...</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="ext-card">
+      <div className="ext-card__body" style={{ padding: "16px 20px" }}>
+        {/* Feature Announcements Toggle */}
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            padding: "12px 0",
+            borderBottom: "1px solid #f3f4f6",
+          }}
+        >
+          <div>
+            <p
+              style={{
+                margin: 0,
+                fontWeight: 600,
+                fontSize: "14px",
+                color: "#1f2937",
+              }}
+            >
+              Feature Announcements
+            </p>
+            <p
+              style={{
+                margin: "4px 0 0",
+                fontSize: "13px",
+                color: "#6b7280",
+              }}
+            >
+              Get notified about new features and updates
+            </p>
+          </div>
+          <label className="email-toggle">
+            <input
+              type="checkbox"
+              checked={featureAnnouncements}
+              disabled={saving}
+              onChange={(e) =>
+                updatePreference("featureAnnouncements", e.target.checked)
+              }
+            />
+            <span className="email-toggle__slider" />
+          </label>
+        </div>
+
+        {/* Weekly Digest Toggle */}
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            padding: "12px 0",
+          }}
+        >
+          <div>
+            <p
+              style={{
+                margin: 0,
+                fontWeight: 600,
+                fontSize: "14px",
+                color: "#1f2937",
+              }}
+            >
+              Weekly Digest
+            </p>
+            <p
+              style={{
+                margin: "4px 0 0",
+                fontSize: "13px",
+                color: "#6b7280",
+              }}
+            >
+              Receive a summary of your saved notes every Monday
+            </p>
+          </div>
+          <label className="email-toggle">
+            <input
+              type="checkbox"
+              checked={weeklyDigest}
+              disabled={saving}
+              onChange={(e) =>
+                updatePreference("weeklyDigest", e.target.checked)
+              }
+            />
+            <span className="email-toggle__slider" />
+          </label>
+        </div>
+      </div>
+    </div>
+  );
+}

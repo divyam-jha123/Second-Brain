@@ -3,6 +3,8 @@ import cors from "cors";
 import { clerkMiddleware } from "./middlewares/auth.js";
 import notesRouter from "./routes/notes.js";
 import userRouter from "./routes/user.js";
+import emailRouter from "./routes/email.js";
+import unsubscribeRouter from "./routes/unsubscribe.js";
 
 
 export function createApp() {
@@ -46,6 +48,8 @@ export function createApp() {
 
   app.use("/notes", notesRouter);
   app.use("/user", userRouter);
+  app.use("/email", emailRouter);
+  app.use("/unsubscribe", unsubscribeRouter);
 
   return app;
 }

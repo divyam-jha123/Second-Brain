@@ -293,3 +293,53 @@ body {
   font-size: 11px;
   color: #9b9690;
 }
+
+/* Email preference toggle switch */
+.email-toggle {
+  position: relative;
+  display: inline-block;
+  width: 44px;
+  height: 24px;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+.email-toggle input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.email-toggle__slider {
+  position: absolute;
+  inset: 0;
+  background: #d1d5db;
+  border-radius: 24px;
+  transition: background 0.25s ease;
+}
+
+.email-toggle__slider::before {
+  content: "";
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  left: 3px;
+  bottom: 3px;
+  background: #fff;
+  border-radius: 50%;
+  transition: transform 0.25s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+}
+
+.email-toggle input:checked + .email-toggle__slider {
+  background: #7c3aed;
+}
+
+.email-toggle input:checked + .email-toggle__slider::before {
+  transform: translateX(20px);
+}
+
+.email-toggle input:disabled + .email-toggle__slider {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

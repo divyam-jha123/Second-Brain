@@ -1,6 +1,7 @@
 import dotenv from "dotenv";
 import mongoose from "mongoose";
 import { createApp } from "./app.js";
+import { startWeeklyDigestCron } from "./cron/weeklyDigest.js";
 
 dotenv.config();
 
@@ -42,6 +43,7 @@ async function startServer() {
 
   try {
     await connectDatabase();
+    startWeeklyDigestCron();
   } catch (err) {
     console.error("Error while connecting to MongoDB:", err);
     process.exit(1);

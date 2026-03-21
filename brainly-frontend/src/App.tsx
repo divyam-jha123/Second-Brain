@@ -4,6 +4,8 @@ import { Dashboard } from './components/dashboard';
 import { SharedDashboard } from './components/sharedDashboard';
 import { LandingPage } from './components/landingPage';
 import { Settings } from './pages/Settings';
+import { Unsubscribe } from './pages/Unsubscribe';
+import { AdminEmail } from './pages/Admin';
 import { Loader } from './icons/loader';
 
 export default function App() {
@@ -22,6 +24,10 @@ export default function App() {
         <Route
           path="/settings"
           element={<ProtectedSettings />}
+        />
+        <Route
+          path="/admin/email"
+          element={<ProtectedAdmin />}
         />
 
         <Route
@@ -43,6 +49,7 @@ export default function App() {
         />
 
         <Route path="/share/:hash" element={<SharedDashboard />} />
+        <Route path="/unsubscribe" element={<Unsubscribe />} />
 
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
@@ -107,4 +114,26 @@ function ProtectedSettings() {
   }
 
   return <Settings />;
+}
+
+function ProtectedAdmin() {
+  const { isSignedIn, isLoaded } = useAuth();
+
+  if (!isLoaded) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-gray-50">
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-8 h-8 border-4 border-purple-200 border-t-purple-600 rounded-full animate-spin" />
+          <p className="text-sm text-gray-400">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!isSignedIn) {
+    return <Navigate to="/sign-in" replace />;
+  }
+
+  // Ideally you'd do a role check here in the future
+  return <AdminEmail />;
 }

@@ -16,6 +16,7 @@ import { BrainIcon } from "../icons/brainIcon";
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { API_URL } from "../config";
 import { ExtensionBanner } from "./ExtensionBanner";
+import { useEmailSync } from "../hooks/useEmailSync";
 
 export type Note = {
   _id: string;
@@ -43,6 +44,9 @@ export const Dashboard = () => {
   const [activeFilter, setActiveFilter] = useState<ContentFilter>("all");
   const { getToken } = useAuth();
   const { user } = useUser();
+
+  // Ensure email preferences exist for this user
+  useEmailSync();
 
   const getContentType = (content: string | undefined): "tweet" | "video" | "document" => {
     if (content?.includes("youtube")) return "video";
