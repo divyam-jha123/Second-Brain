@@ -4,12 +4,13 @@ import { TwitterIcon } from "../icons/twitterIcon";
 import { VideoIcon } from "../icons/videoIcon";
 import { DocumentIcon } from "../icons/documentIcon";
 import { LinkIcon } from "../icons/linkIcon";
+import { LinkedinIcon } from "../icons/linkedinIcon";
 import { TagIcon } from "../icons/tagIcon";
 import { UserButton } from "@clerk/react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { SettingIcon } from "../icons/settingIcon";
 
-export type ContentFilter = "all" | "tweet" | "video" | "document" | "settings";
+export type ContentFilter = "all" | "tweet" | "video" | "document" | "linkedin" | "settings";
 
 interface SidebarProps {
   activeFilter?: ContentFilter;
@@ -60,6 +61,12 @@ export const Sidebar = ({ activeFilter = "all", onFilterChange }: SidebarProps) 
           icon={<VideoIcon size="md" />}
           isActive={activeFilter === "video"}
           onClick={() => handleClick("video")}
+        />
+        <SidebarItem
+          text="LinkedIn"
+          icon={<LinkedinIcon size="md" />}
+          isActive={activeFilter === "linkedin"}
+          onClick={() => handleClick("linkedin")}
         />
         <SidebarItem
           text="Documents"

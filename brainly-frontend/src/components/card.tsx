@@ -3,6 +3,7 @@ import { DeleteIcon } from "../icons/deleteIcon";
 import { DocumentIcon } from "../icons/documentIcon";
 import { TwitterIcon } from "../icons/twitterIcon";
 import { VideoIcon } from "../icons/videoIcon";
+import { LinkedinIcon } from "../icons/linkedinIcon";
 import { CrossIcon } from "../icons/crossicon";
 import { useEffect, useState, useRef } from "react";
 
@@ -16,7 +17,7 @@ declare global {
   }
 }
 
-type CardType = "document" | "tweet" | "video";
+type CardType = "document" | "tweet" | "video" | "linkedin";
 interface CardProps {
   title: string;
   type: CardType;
@@ -33,6 +34,7 @@ const typeIcons: Record<CardType, React.ReactElement> = {
   document: <DocumentIcon size="sm" />,
   tweet: <TwitterIcon size="sm" />,
   video: <VideoIcon size="sm" />,
+  linkedin: <LinkedinIcon size="sm" />,
 };
 
 export const Card = (props: CardProps) => {
@@ -99,6 +101,41 @@ export const Card = (props: CardProps) => {
           <a href={props.content.replace("x.com", "twitter.com")}></a>
         </blockquote>
       )}
+
+      {props.type === "linkedin" && props.content && (() => {
+        let embedUrl = props.content;
+        
+        // 1. If user pasted a full iframe snippet, extract the src URL
+        const iframeMatch = props.content.match(/src="([^"]+)"/);
+        if (iframeMatch) {
+          embedUrl = iframeMatch[1];
+        } else {
+          // 2. Identify an explicit URN like urn:li:activity:1234
+          const urnMatch = props.content.match(/(urn:li:[\w]+:\d+)/);
+          if (urnMatch) {
+            embedUrl = `https://www.linkedin.com/embed/feed/update/${urnMatch[0]}`;
+          } else {
+            // 3. Just a regular linkedin.com/posts/ url, extract the ID
+            const idMatch = props.content.match(/\d{18,20}/);
+            if (idMatch) {
+              const type = props.content.includes('-ugcPost-') 
+                ? 'ugcPost' 
+                : props.content.includes('-activity-') ? 'activity' : 'share';
+              embedUrl = `https://www.linkedin.com/embed/feed/update/urn:li:${type}:${idMatch[0]}`;
+            }
+          }
+        }
+
+        return (
+          <iframe
+            src={embedUrl}
+            className="w-full rounded-lg min-h-[400px] bg-white"
+            frameBorder="0"
+            allowFullScreen={true}
+            title={props.title}
+          ></iframe>
+        );
+      })()}
 
       {props.type === "document" && props.content && (
         <p className="text-sm text-gray-600 leading-relaxed">{props.content}</p>

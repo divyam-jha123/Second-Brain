@@ -13,6 +13,7 @@ import { VideoIcon } from "../icons/videoIcon";
 import { DocumentIcon } from "../icons/documentIcon";
 import { TagIcon } from "../icons/tagIcon";
 import { BrainIcon } from "../icons/brainIcon";
+import { LinkedinIcon } from "../icons/linkedinIcon"; // Added LinkedinIcon import
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { API_URL } from "../config";
 import { ExtensionBanner } from "./ExtensionBanner";
@@ -48,9 +49,10 @@ export const Dashboard = () => {
   // Ensure email preferences exist for this user
   useEmailSync();
 
-  const getContentType = (content: string | undefined): "tweet" | "video" | "document" => {
-    if (content?.includes("youtube")) return "video";
+  const getContentType = (content: string | undefined): "tweet" | "video" | "document" | "linkedin" => {
+    if (content?.includes("youtube") || content?.includes("youtu.be")) return "video";
     if (content?.includes("twitter") || content?.includes("x.com")) return "tweet";
+    if (content?.includes("linkedin.com")) return "linkedin";
     return "document";
   };
 
@@ -215,6 +217,12 @@ export const Dashboard = () => {
             Videos
           </button>
           <button 
+            onClick={() => setActiveFilter("linkedin")}
+            className={`whitespace-nowrap px-4 py-1.5 rounded-full text-sm font-medium border transition-colors ${activeFilter === "linkedin" ? "bg-purple-600 text-white border-purple-600 shadow-sm" : "bg-white text-gray-600 border-gray-200"}`}
+          >
+            LinkedIn
+          </button>
+          <button 
             onClick={() => setActiveFilter("document")}
             className={`whitespace-nowrap px-4 py-1.5 rounded-full text-sm font-medium border transition-colors ${activeFilter === "document" ? "bg-purple-600 text-white border-purple-600 shadow-sm" : "bg-white text-gray-600 border-gray-200"}`}
           >
@@ -275,6 +283,13 @@ export const Dashboard = () => {
         >
           <VideoIcon size="md" />
           <span className="text-[10px] font-medium tracking-wide">Videos</span>
+        </div>
+        <div 
+          onClick={() => setActiveFilter("linkedin")}
+          className={`flex flex-col items-center gap-1 min-w-[64px] ${activeFilter === "linkedin" ? "text-purple-600" : "text-gray-400"} cursor-pointer hover:text-purple-500 transition-colors`}
+        >
+          <LinkedinIcon size="md" />
+          <span className="text-[10px] font-medium tracking-wide">LinkedIn</span>
         </div>
         <div 
           onClick={() => setActiveFilter("document")}
