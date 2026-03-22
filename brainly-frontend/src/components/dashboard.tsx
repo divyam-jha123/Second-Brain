@@ -120,7 +120,8 @@ export const Dashboard = () => {
     }
   };
 
-  const SyncUser = async () => {
+  const SyncUser = useCallback(async () => {
+    if (!user) return;
     try {
       const token = await getToken();
       await axios.post(`${API_URL}/user/sync`, {
@@ -134,7 +135,11 @@ export const Dashboard = () => {
     } catch (error) {
       console.error("Error syncing user:", error);
     }
-  }
+  }, [user, getToken]);
+
+  useEffect(() => {
+    SyncUser();
+  }, [SyncUser]);
 
   return (
     <div className="flex min-h-screen bg-gray-50 pb-[80px] md:pb-0 relative">
