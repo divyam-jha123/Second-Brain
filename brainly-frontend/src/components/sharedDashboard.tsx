@@ -88,12 +88,14 @@ export const SharedDashboard = () => {
                 key={note._id}
                 title={note.title}
                 type={
-                  note.content?.includes("youtube")
+                  note.content?.includes("youtube") || note.content?.includes("youtu.be")
                     ? "video"
                     : note.content?.includes("twitter") ||
                         note.content?.includes("x.com")
                       ? "tweet"
-                      : "document"
+                      : note.content?.includes("linkedin.com")
+                        ? "linkedin"
+                        : "document"
                 }
                 content={note.content}
                 tags={["shared"]}
