@@ -11,9 +11,9 @@
 
 ## Screenshots
 
-- **Landing**: `docs/screenshots/landingPage.png`
-- **Dashboard**: `docs/screenshots/dashboard.png`
-- **Share flow**: `docs/screenshots/share.png`
+- **Landing**: `https://github.com/divyam-jha123/Second-Brain/blob/main/docs/screenshots/landingPage.png`
+- **Dashboard**: `https://github.com/divyam-jha123/Second-Brain/blob/main/docs/screenshots/dashboard.png`
+- **Share flow**: `https://github.com/divyam-jha123/Second-Brain/blob/main/docs/screenshots/share.png`
 
 ## Features
 
@@ -22,7 +22,7 @@
   - Protected routes for authenticated users
 - **Content capture**
   - Create notes with a title + link/content
-  - Supports common content types (Tweets, YouTube, Docs)
+  - Supports common content types (Tweets, YouTube, Docs, LinkedIn)
 - **Organize & browse**
   - Filter notes by type (All / Tweets / Videos / Docs)
   - Card-based UI with preview + expanded modal
@@ -31,6 +31,10 @@
 - **Developer experience**
   - Separate CI pipelines for frontend and backend
   - Unit/component tests (frontend) + integration-style route tests (backend)
+- **Browser extension**
+  - Save titles and links directly from any browser tab
+- **Email notifications**
+  - Welcome emails, weekly updates, and feature announcements via a dedicated email service
 
 ## Tech stack
 
@@ -77,77 +81,87 @@ brainexpo/
 │  │  ├─ models/
 │  │  └─ middlewares/
 │  └─ tests/
+├─ brainly-extension/
+│  ├─ src/
+│  └─ public/
 └─ .github/
    └─ workflows/
-```
-
-## Environment variables
-
-### Frontend (`brainly-frontend`)
-
-Create `brainly-frontend/.env`:
-
-```bash
-VITE_CLERK_PUBLISHABLE_KEY=pk_...
-# Optional (defaults to the deployed Render backend or localhost depending on config)
-VITE_BACKEND_URL=https://second-brain-miuh.onrender.com
-# Optional alias supported in some setups
-VITE_API_URL=https://second-brain-miuh.onrender.com
-```
-
-### Backend (`brainly-backend`)
-
-Create `brainly-backend/.env`:
-
-```bash
-PORT=8000
-MONGO_URI=mongodb+srv://...
-
-# Clerk (required)
-CLERK_SECRET_KEY=sk_...
-
-# CORS allowlist (comma-separated)
-# Example:
-# CORS_ORIGINS=https://brainexpo.me,https://www.brainexpo.me,http://localhost:5173
-CORS_ORIGINS=
 ```
 
 ## Installation & local setup
 
 ### Prerequisites
 
-- Node.js (recommended: **20+**)
-- npm
-- A MongoDB instance (local or Atlas)
+- **Node.js 20+** — check with `node -v`
+- **npm** — comes with Node
 
-### 1) Clone
+> **Zero external services needed for local dev.** Clerk auth keys are pre-filled in `.env.example`. MongoDB is also optional — if you leave `MONGO_URI` blank, the server automatically starts an in-memory MongoDB (data resets on restart). Only a real MongoDB connection is needed for production.
+
+### Step 1 — Clone the repo
 
 ```bash
 git clone <your-repo-url>
 cd brainexpo
 ```
 
-### 2) Backend
+### Step 2 — Set up the backend
 
 ```bash
 cd brainly-backend
 npm install
-cp .env.example .env # if you have one; otherwise create .env manually
+cp .env.example .env
+```
+
+The `.env.example` file is ready to use as-is for local development — no changes needed. If you want data to persist between restarts, open `brainly-backend/.env` and add your MongoDB connection string:
+
+```bash
+MONGO_URI=mongodb+srv://<user>:<password>@<cluster>.mongodb.net/brainly
+```
+
+Otherwise, just start the server — it will use an in-memory database automatically:
+
+```bash
 npm run build
 npm run dev
 ```
 
-Backend runs on `http://localhost:8000` (or your `PORT`).
+✅ Backend is now running at `http://localhost:8000`
 
-### 3) Frontend
+### Step 3 — Set up the frontend
+
+Open a **new terminal**:
 
 ```bash
-cd ../brainly-frontend
+cd brainly-frontend
 npm install
+cp .env.example .env
 npm run dev
 ```
 
-Frontend runs on `http://localhost:5173`.
+No extra config needed — the Clerk publishable key and backend URL are already set in `.env.example`.
+
+✅ Frontend is now running at `http://localhost:5173`
+
+### Step 4 — (Optional) Set up the browser extension
+
+```bash
+cd brainly-extension
+npm install
+cp .env.example .env
+npm run dev
+```
+
+### You're all set! 🚀
+
+Open `http://localhost:5173` in your browser to see the app.
+
+### Troubleshooting
+
+| Problem | Fix |
+|---|---|
+| App data lost on restart | Set `MONGO_URI` in `brainly-backend/.env` to use a real MongoDB instance for persistence |
+| Clerk sign-in not working | The test keys only work in development mode — don't use them in production |
+| CORS errors in browser console | Ensure `CORS_ORIGINS=http://localhost:5173` is set in `brainly-backend/.env` |
 
 ## API endpoints
 
@@ -217,7 +231,5 @@ cd ../brainly-backend && npm run ci
 
 4. Open a PR with a clear summary and screenshots (for UI changes)
 
-## License
 
-This project is currently **unlicensed**. If you want to open-source it, add a `LICENSE` file (MIT is a common choice).
 
