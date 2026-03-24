@@ -1,0 +1,39 @@
+services:
+  mongo:
+    image: mongo:7
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+
+  backend:
+    build:
+      context: ./brainly-backend
+    restart: unless-stopped
+    depends_on:
+      - mongo
+    env_file:
+      - ./brainly-backend/.env
+    environment:
+      PORT: 8000
+      NODE_ENV: production
+      MONGO_URI: mongodb://mongo:27017/secondbrain
+      CORS_ORIGINS: http://localhost:5173,http://localhost
+    ports:
+      - "8000:8000"
+
+  frontend:
+    build:
+      context: ./brainly-frontend
+      args:
+        VITE_BACKEND_URL: /api
+        VITE_CLERK_PUBLISHABLE_KEY: ${VITE_CLERK_PUBLISHABLE_KEY}
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "5173:80"
+
+volumes:
+  mongo_data:

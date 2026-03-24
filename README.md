@@ -94,8 +94,53 @@ brainexpo/
 
 - **Node.js 20+** — check with `node -v`
 - **npm** — comes with Node
+- **Docker + Docker Compose** (for containerized local setup)
 
-> **Zero external services needed for local dev.** Clerk auth keys are pre-filled in `.env.example`. MongoDB is also optional — if you leave `MONGO_URI` blank, the server automatically starts an in-memory MongoDB (data resets on restart). Only a real MongoDB connection is needed for production.
+## Docker setup (recommended)
+
+### 1) Create env files
+
+```bash
+cp .env.example .env
+cp brainly-backend/.env.example brainly-backend/.env
+cp brainly-frontend/.env.example brainly-frontend/.env
+```
+
+Fill in required Clerk values:
+
+- `.env` (root): `VITE_CLERK_PUBLISHABLE_KEY`
+- `brainly-backend/.env`: `CLERK_SECRET_KEY` (and optionally `RESEND_API_KEY`)
+
+### 2) Start all services
+
+```bash
+docker compose up --build
+```
+
+Services:
+
+- Frontend: `http://localhost:5173`
+- Backend API: `http://localhost:8000`
+- MongoDB: `mongodb://localhost:27017`
+
+The frontend container serves the SPA through nginx and includes:
+
+- SPA route fallback for Clerk routes (e.g. `/sign-up/verify-email-address`)
+- Reverse proxy `/api/* -> backend:8000`
+
+### 3) Stop services
+
+```bash
+docker compose down
+```
+
+To also remove MongoDB volume data:
+
+```bash
+docker compose down -v
+```
+
+## Manual local setup (without Docker)
 
 ### Step 1 — Clone the repo
 
@@ -112,7 +157,7 @@ npm install
 cp .env.example .env
 ```
 
-The `.env.example` file is ready to use as-is for local development — no changes needed. If you want data to persist between restarts, open `brainly-backend/.env` and add your MongoDB connection string:
+Set required values in `brainly-backend/.env` (at least `CLERK_SECRET_KEY`). If you want data to persist between restarts, add your MongoDB connection string:
 
 ```bash
 MONGO_URI=mongodb+srv://<user>:<password>@<cluster>.mongodb.net/brainly
@@ -138,7 +183,7 @@ cp .env.example .env
 npm run dev
 ```
 
-No extra config needed — the Clerk publishable key and backend URL are already set in `.env.example`.
+Set `VITE_CLERK_PUBLISHABLE_KEY` in `brainly-frontend/.env`. Keep `VITE_BACKEND_URL=http://localhost:8000` for non-Docker local development.
 
 ✅ Frontend is now running at `http://localhost:5173`
 
