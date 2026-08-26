@@ -2,7 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { SignIn, SignUp, useAuth } from '@clerk/react';
 import { Dashboard } from './components/dashboard';
 import { SharedDashboard } from './components/sharedDashboard';
-import { LandingPage } from './components/landingPage';
+import { BrainExpoLanding } from './components/BrainExpoLanding';
 import { Settings } from './pages/Settings';
 import { Unsubscribe } from './pages/Unsubscribe';
 import { AdminEmail } from './pages/Admin';
@@ -71,7 +71,7 @@ function HomePage() {
     return <Navigate to="/dashboard" replace />;
   }
 
-  return <LandingPage />;
+  return <BrainExpoLanding />;
 }
 
 function ProtectedDashboard() {

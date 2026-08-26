@@ -1,10 +1,86 @@
 @import "tailwindcss";
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap');
 
 body {
   font-family: 'Inter', sans-serif;
   margin: 0;
   padding: 0;
+}
+
+/* Manrope — geometric, rounded display face for the hero headings. */
+.font-hero {
+  font-family: 'Manrope', 'Inter', sans-serif;
+  letter-spacing: -0.02em;
+}
+
+/* Hero node-graph orb glow */
+@keyframes orbPulse {
+  0%, 100% { opacity: 0.45; transform: scale(1); }
+  50% { opacity: 0.8; transform: scale(1.08); }
+}
+
+.orb-glow {
+  animation: orbPulse 4.5s ease-in-out infinite;
+}
+
+@keyframes wireFlow {
+  to { stroke-dashoffset: -600; }
+}
+
+.wire-flow {
+  animation: wireFlow 14s linear infinite;
+}
+
+/* Hero floating tiles — gentle continuous idle drift */
+@keyframes heroFloat {
+  0%, 100% { transform: translateY(-6px); }
+  50% { transform: translateY(6px); }
+}
+
+.hero-float {
+  animation: heroFloat 6.5s ease-in-out infinite;
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .orb-glow, .wire-flow, .hero-float { animation: none; }
+}
+
+/* Landing page marquee tickers (integrations + testimonials) */
+@keyframes marqueeLeft {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+@keyframes marqueeRight {
+  from { transform: translateX(-50%); }
+  to { transform: translateX(0); }
+}
+
+.marquee-track {
+  display: flex;
+  width: max-content;
+  will-change: transform;
+}
+
+.marquee-left {
+  animation: marqueeLeft 40s linear infinite;
+}
+
+.marquee-right {
+  animation: marqueeRight 40s linear infinite;
+}
+
+.marquee-slow {
+  animation-duration: 60s;
+}
+
+.marquee-pause:hover .marquee-track {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marquee-track { animation: none; }
 }
 
 /* Card expand animations */
