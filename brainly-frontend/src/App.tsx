@@ -11,6 +11,7 @@ import {
   CaptureSettings,
   DangerSettings,
   DataSettings,
+  PlanSettings,
 } from './pages/settings/Stubs';
 import { AppearanceSettings } from './components/settings/appearance';
 import { ExtensionSettings } from './components/settings/extension';
@@ -44,6 +45,7 @@ export default function App() {
           <Route path="appearance" element={<AppearanceSettings />} />
           <Route path="extension" element={<ExtensionSettings />} />
           <Route path="data" element={<DataSettings />} />
+          <Route path="plan" element={<PlanSettings />} />
           <Route path="danger" element={<DangerSettings />} />
         </Route>
         <Route

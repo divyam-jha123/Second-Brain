@@ -3,10 +3,12 @@ import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import axios from "axios";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
+import { useClerk } from "@clerk/react";
 import { SettingsLayout } from "../../pages/settings/SettingsLayout";
 import { EmailSettings } from "../../pages/settings/Email";
 import { TagSettings } from "../settings/tags";
 import { SharingSettings } from "../settings/sharing";
+import { CaptureSettings, DangerSettings } from "../../pages/settings/Stubs";
 import { ThemeProvider } from "../../theme/ThemeProvider";
 import { API_URL } from "../../config";
 
@@ -19,7 +21,12 @@ vi.mock("@clerk/react", () => {
   const user = {
     user: { primaryEmailAddress: { emailAddress: "alice@example.com" } },
   };
-  return { useAuth: () => auth, useUser: () => user };
+  const clerk = { signOut: vi.fn() };
+  return {
+    useAuth: () => auth,
+    useUser: () => user,
+    useClerk: () => clerk,
+  };
 });
 
 const PREFS = {
@@ -49,6 +56,8 @@ const renderSettings = (initial = "/settings/tags") =>
             <Route path="tags" element={<TagSettings />} />
             <Route path="sharing" element={<SharingSettings />} />
             <Route path="email" element={<EmailSettings />} />
+            <Route path="capture" element={<CaptureSettings />} />
+            <Route path="danger" element={<DangerSettings />} />
           </Route>
         </Routes>
       </MemoryRouter>
@@ -81,6 +90,16 @@ describe("settings navigation", () => {
     );
     // Same DOM node: the layout was not torn down and rebuilt.
     expect(screen.getByRole("link", { name: "Profile" })).toBe(nav);
+  });
+
+  it("signs out from the foot of the nav", async () => {
+    renderSettings();
+    const { signOut } = useClerk();
+
+    await userEvent.click(screen.getByRole("button", { name: /sign out/i }));
+
+    // Back to the landing page, not a protected route that would bounce.
+    expect(signOut).toHaveBeenCalledWith({ redirectUrl: "/" });
   });
 
   it("marks the active item from the pathname", () => {
@@ -246,5 +265,38 @@ describe("SharingSettings", () => {
       ),
     );
     expect(screen.queryByText("Tag · react")).not.toBeInTheDocument();
+  });
+});
+
+describe("coming-soon sections", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    vi.mocked(axios.get).mockResolvedValue({ data: {} });
+  });
+
+  it("says what the section will do, not just \"coming soon\"", () => {
+    renderSettings("/settings/capture");
+
+    expect(screen.getByText("Not built yet")).toBeInTheDocument();
+    expect(
+      screen.getByText(/suggest tags based on what you've tagged before/i),
+    ).toBeInTheDocument();
+  });
+
+  it("points the notify link at the announcements toggle", () => {
+    renderSettings("/settings/capture");
+
+    expect(
+      screen.getByRole("link", { name: /notify me when it ships/i }),
+    ).toHaveAttribute("href", "/settings/email");
+  });
+
+  it("offers no notify link for account deletion", () => {
+    renderSettings("/settings/danger");
+
+    expect(screen.getByText("Not built yet")).toBeInTheDocument();
+    expect(
+      screen.queryByRole("link", { name: /notify me/i }),
+    ).not.toBeInTheDocument();
   });
 });

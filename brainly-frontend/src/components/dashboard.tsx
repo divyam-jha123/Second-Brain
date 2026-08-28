@@ -23,6 +23,8 @@ import { OnboardingModal } from "./OnboardingModal";
 import { useEmailSync } from "../hooks/useEmailSync";
 import { useOnboardingStatus } from "../hooks/useOnboardingStatus";
 import { getContentType } from "../lib/notes";
+import { readDefaultView } from "../lib/prefs";
+import type { ViewMode } from "../lib/prefs";
 import {
   createCollection,
   deleteCollection as deleteCollectionRequest,
@@ -49,7 +51,6 @@ type CreateNotePayload = {
 };
 
 type SortOrder = "recent" | "oldest" | "title";
-type ViewMode = "grid" | "list";
 
 const SORT_LABELS: Record<SortOrder, string> = {
   recent: "Recent",
@@ -92,7 +93,7 @@ export const Dashboard = () => {
   );
   const [query, setQuery] = useState("");
   const [sortOrder, setSortOrder] = useState<SortOrder>("recent");
-  const [viewMode, setViewMode] = useState<ViewMode>("grid");
+  const [viewMode, setViewMode] = useState<ViewMode>(readDefaultView);
   const searchRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
   const { getToken } = useAuth();
@@ -317,6 +318,7 @@ export const Dashboard = () => {
             setActiveTag(null);
           }}
           inboxCount={inboxCount}
+          savedCount={notes.length}
           collections={collections}
           tags={tags}
           activeCollectionId={activeCollectionId}

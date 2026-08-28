@@ -1,5 +1,5 @@
 import { Router, Request, Response } from "express";
-import { requireAuth, getAuth } from "../middlewares/auth.js";
+import { requireAuth, requireAdmin, getAuth } from "../middlewares/auth.js";
 import { EmailPreference } from "../models/emailPreference.js";
 import {
   DEFAULT_PREFS,
@@ -136,6 +136,7 @@ router.post("/send-now", requireAuth(), async (req: Request, res: Response) => {
 router.post(
   "/send-announcement",
   requireAuth(),
+  requireAdmin(),
   async (req: Request, res: Response) => {
     try {
       const { subject, title, body, ctaText, ctaUrl } = req.body;

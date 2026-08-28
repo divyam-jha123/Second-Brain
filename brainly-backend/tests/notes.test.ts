@@ -389,6 +389,16 @@ describe("notes routes", () => {
     expect(res.status).toBe(404);
   });
 
+  it("GET /notes/share is not swallowed by GET /notes/:id", async () => {
+    // Express matches in registration order. With "/:id" declared first, this
+    // request tried to cast "share" to an ObjectId and 404'd, which surfaced
+    // in the UI as "Couldn't load your settings."
+    const res = await request(app).get("/notes/share").set("x-user-id", userId);
+
+    expect(res.status).toBe(200);
+    expect(res.body.links).toBeDefined();
+  });
+
   it("GET /notes/api/share/:hash returns 404 when hash missing", async () => {
     const res = await request(app).get("/notes/api/share/nope");
     expect(res.status).toBe(404);

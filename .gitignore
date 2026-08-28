@@ -1,6 +1,0 @@
-.env
-.env.*
-*.env.bak*
-dist/
-node_modules/
-coverage/

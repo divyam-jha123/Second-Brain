@@ -1,15 +1,14 @@
 import { useState } from "react";
-import { useUser } from "@clerk/react";
 import { useLocation, useNavigate } from "react-router-dom";
 import {
   LuFolder,
   LuInbox,
   LuLayers,
   LuPlus,
-  LuSettings,
   LuTrash2,
 } from "react-icons/lu";
 import { BrainExpoLogo } from "../assets/brand/BrainExpoLogo";
+import { AccountMenu } from "./AccountMenu";
 import type { Collection, Tag } from "../lib/api";
 
 export type ContentFilter =
@@ -26,6 +25,8 @@ interface SidebarProps {
   onFilterChange?: (filter: ContentFilter) => void;
   /** Notes with no tags yet — the number shown on the Inbox badge. */
   inboxCount?: number;
+  /** Total saves — the usage figure in the account menu. */
+  savedCount?: number;
   collections?: Collection[];
   tags?: Tag[];
   activeCollectionId?: string | null;
@@ -100,6 +101,7 @@ export const Sidebar = ({
   activeFilter = "all",
   onFilterChange,
   inboxCount = 0,
+  savedCount,
   collections = [],
   tags = [],
   activeCollectionId = null,
@@ -111,7 +113,6 @@ export const Sidebar = ({
 }: SidebarProps) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { user } = useUser();
   const [isAdding, setIsAdding] = useState(false);
   const [draftName, setDraftName] = useState("");
   const [showAllTags, setShowAllTags] = useState(false);
@@ -246,37 +247,8 @@ export const Sidebar = ({
         </div>
       </div>
 
-      {/* One way into settings: the account row itself. Sign-out lives there. */}
-      <div className="border-t border-line px-3 py-3">
-        <button
-          type="button"
-          onClick={() => navigate("/settings/profile")}
-          aria-label="Settings"
-          className={`flex w-full items-center gap-2 rounded-lg px-2 py-2 text-left transition-colors hover:bg-surface-hover cursor-pointer ${
-            location.pathname.startsWith("/settings") ? "bg-surface-hover" : ""
-          }`}
-        >
-          {user?.imageUrl ? (
-            <img
-              src={user.imageUrl}
-              alt=""
-              className="h-7 w-7 shrink-0 rounded-full object-cover"
-            />
-          ) : (
-            <span className="h-7 w-7 shrink-0 rounded-full bg-surface-hover" />
-          )}
-          <span className="min-w-0 flex-1 truncate text-sm text-fg">
-            {user?.fullName ?? user?.username ?? "Account"}
-          </span>
-          <LuSettings
-            className={`shrink-0 ${
-              location.pathname.startsWith("/settings")
-                ? "text-fg"
-                : "text-fg-muted"
-            }`}
-          />
-        </button>
-      </div>
+      <AccountMenu savedCount={savedCount} />
+
     </aside>
   );
 };

@@ -58,31 +58,6 @@ router.get("/", requireAuth(), async (req: Request, res: Response) => {
   });
 });
 
-router.get("/:id", requireAuth(), async (req: Request, res: Response) => {
-  // getNotesById
-  try {
-    const id = req.params.id;
-    const { userId } = getAuth(req);
-
-    // Scoped to the caller: a note belonging to someone else must look absent,
-    // not forbidden, so ids stay non-enumerable.
-    const note = await Notes.findOne({ _id: id, userId });
-
-    if (!note) {
-      return res.status(404).json({ msg: "Note not found" });
-    }
-
-    return res.json({
-      msg: note,
-    });
-  } catch (error) {
-    return res.status(404).json({
-      msg: "item not found",
-      err: error,
-    });
-  }
-});
-
 router.post(
   "/create-note",
   requireAuth(),
@@ -118,95 +93,6 @@ router.post(
   },
 );
 
-router.patch("/:id", requireAuth(), async (req: Request, res: Response) => {
-  // Update the editable fields of a note the caller owns.
-  try {
-    const id = req.params.id;
-    const { userId } = getAuth(req);
-    const { title, note, tags, collectionId } = req.body;
-
-    const update: Record<string, unknown> = {};
-    if (typeof title === "string") update.title = title;
-    if (typeof note === "string") update.note = note;
-    if (tags !== undefined) update.tags = normalizeTags(tags);
-    // null is meaningful here — it moves the note back out of any collection.
-    if (collectionId !== undefined) update.collectionId = collectionId || null;
-
-    if (Object.keys(update).length === 0) {
-      return res.status(400).json({ msg: "No updatable fields provided" });
-    }
-
-    const updated = await Notes.findOneAndUpdate(
-      { _id: id, userId },
-      { $set: update },
-      { new: true },
-    );
-
-    if (!updated) {
-      return res.status(404).json({ msg: "Note not found" });
-    }
-
-    return res.json({
-      msg: "Note updated successfully",
-      post: updated,
-    });
-  } catch (error) {
-    return res.status(500).json({
-      msg: "Error updating note",
-      error,
-    });
-  }
-});
-
-router.delete("/:id", requireAuth(), async (req: Request, res: Response) => {
-  // deleteNotesById
-  try {
-    const id = req.params.id;
-    const { userId } = getAuth(req);
-
-    const note = await Notes.findOneAndDelete({ _id: id, userId });
-
-    if (!note) {
-      return res.status(404).json({
-        msg: "Note not found",
-      });
-    }
-
-    return res.json({
-      msg: "Note deleted successfully",
-      deletedNote: note,
-    });
-  } catch (error) {
-    return res.status(500).json({
-      msg: "Error deleting note",
-      error,
-    });
-  }
-});
-
-/** Resolve a link's scope to the note filter it stands for. */
-function shareFilter(link: ILink): Record<string, unknown> | null {
-  switch (link.scope) {
-    case "collection":
-      return link.collectionId
-        ? { userId: link.userId, collectionId: link.collectionId }
-        : null;
-    case "tag":
-      return link.tag ? { userId: link.userId, tags: link.tag } : null;
-    case "items":
-      return link.noteIds.length
-        ? { userId: link.userId, _id: { $in: link.noteIds } }
-        : null;
-    case "all":
-    default:
-      return { userId: link.userId };
-  }
-}
-
-/**
- * Mint a link for a chosen scope. The owner picks what goes out before
- * anything is generated, so we verify they own whatever they named.
- */
 router.post("/share", requireAuth(), async (req: Request, res: Response) => {
   try {
     const { userId } = getAuth(req);
@@ -306,6 +192,7 @@ router.post("/share", requireAuth(), async (req: Request, res: Response) => {
 });
 
 /** The owner's live links, for the Sharing section in settings. */
+
 router.get("/share", requireAuth(), async (req: Request, res: Response) => {
   const { userId } = getAuth(req);
 
@@ -362,5 +249,120 @@ router.get("/api/share/:hash", async (req: Request, res: Response) => {
     content,
   });
 });
+
+router.get("/:id", requireAuth(), async (req: Request, res: Response) => {
+  // getNotesById
+  try {
+    const id = req.params.id;
+    const { userId } = getAuth(req);
+
+    // Scoped to the caller: a note belonging to someone else must look absent,
+    // not forbidden, so ids stay non-enumerable.
+    const note = await Notes.findOne({ _id: id, userId });
+
+    if (!note) {
+      return res.status(404).json({ msg: "Note not found" });
+    }
+
+    return res.json({
+      msg: note,
+    });
+  } catch (error) {
+    return res.status(404).json({
+      msg: "item not found",
+      err: error,
+    });
+  }
+});
+
+router.patch("/:id", requireAuth(), async (req: Request, res: Response) => {
+  // Update the editable fields of a note the caller owns.
+  try {
+    const id = req.params.id;
+    const { userId } = getAuth(req);
+    const { title, note, tags, collectionId } = req.body;
+
+    const update: Record<string, unknown> = {};
+    if (typeof title === "string") update.title = title;
+    if (typeof note === "string") update.note = note;
+    if (tags !== undefined) update.tags = normalizeTags(tags);
+    // null is meaningful here — it moves the note back out of any collection.
+    if (collectionId !== undefined) update.collectionId = collectionId || null;
+
+    if (Object.keys(update).length === 0) {
+      return res.status(400).json({ msg: "No updatable fields provided" });
+    }
+
+    const updated = await Notes.findOneAndUpdate(
+      { _id: id, userId },
+      { $set: update },
+      { new: true },
+    );
+
+    if (!updated) {
+      return res.status(404).json({ msg: "Note not found" });
+    }
+
+    return res.json({
+      msg: "Note updated successfully",
+      post: updated,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      msg: "Error updating note",
+      error,
+    });
+  }
+});
+
+router.delete("/:id", requireAuth(), async (req: Request, res: Response) => {
+  // deleteNotesById
+  try {
+    const id = req.params.id;
+    const { userId } = getAuth(req);
+
+    const note = await Notes.findOneAndDelete({ _id: id, userId });
+
+    if (!note) {
+      return res.status(404).json({
+        msg: "Note not found",
+      });
+    }
+
+    return res.json({
+      msg: "Note deleted successfully",
+      deletedNote: note,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      msg: "Error deleting note",
+      error,
+    });
+  }
+});
+
+/** Resolve a link's scope to the note filter it stands for. */
+function shareFilter(link: ILink): Record<string, unknown> | null {
+  switch (link.scope) {
+    case "collection":
+      return link.collectionId
+        ? { userId: link.userId, collectionId: link.collectionId }
+        : null;
+    case "tag":
+      return link.tag ? { userId: link.userId, tags: link.tag } : null;
+    case "items":
+      return link.noteIds.length
+        ? { userId: link.userId, _id: { $in: link.noteIds } }
+        : null;
+    case "all":
+    default:
+      return { userId: link.userId };
+  }
+}
+
+/**
+ * Mint a link for a chosen scope. The owner picks what goes out before
+ * anything is generated, so we verify they own whatever they named.
+ */
 
 export default router;

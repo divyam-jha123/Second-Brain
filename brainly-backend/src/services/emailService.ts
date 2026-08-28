@@ -5,6 +5,7 @@ import { Notes } from "../models/notes.js";
 import { User } from "../models/user.js";
 import {
   buildWeeklyDigestHtml,
+  type DigestNoteType,
   type WeeklyDigestData,
 } from "../emails/weeklyDigest.js";
 import {
@@ -64,43 +65,101 @@ export function generateUnsubscribeUrl(
 
 // ─── Weekly Digest ──────────────────────────────────────────────────
 
+const NOTES_IN_DIGEST = 6;
+
+function noteType(content: string | undefined): DigestNoteType {
+  if (content?.includes("youtube") || content?.includes("youtu.be")) return "video";
+  if (content?.includes("twitter") || content?.includes("x.com")) return "tweet";
+  if (content?.includes("linkedin.com")) return "linkedin";
+  return "document";
+}
+
+/** "18–24 Aug", or "28 Aug – 3 Sep" when the week straddles two months. */
+function formatRange(start: Date, end: Date, timeZone: string): string {
+  const day = (d: Date) =>
+    new Intl.DateTimeFormat("en-GB", { timeZone, day: "numeric" }).format(d);
+  const month = (d: Date) =>
+    new Intl.DateTimeFormat("en-GB", { timeZone, month: "short" }).format(d);
+
+  return month(start) === month(end)
+    ? `${day(start)}–${day(end)} ${month(end)}`
+    : `${day(start)} ${month(start)} – ${day(end)} ${month(end)}`;
+}
+
 export async function sendWeeklyDigest(
   userId: string,
   email: string,
   username: string,
-): Promise<void> {
-  const oneWeekAgo = new Date();
+  options: {
+    timeZone?: string;
+    sections?: {
+      savedThisWeek: boolean;
+      untaggedNudge: boolean;
+      recallQuestions: boolean;
+    };
+  } = {},
+): Promise<boolean> {
+  const timeZone = options.timeZone || "UTC";
+  const sections = options.sections ?? {
+    savedThisWeek: true,
+    untaggedNudge: true,
+    recallQuestions: false,
+  };
+
+  const now = new Date();
+  const oneWeekAgo = new Date(now);
   oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
 
-  const recentNotes = await Notes.find({
+  const weekNotes = await Notes.find({
     userId,
     createdAt: { $gte: oneWeekAgo },
   })
     .sort({ createdAt: -1 })
-    .limit(10)
     .lean();
+
+  const untaggedThisWeek = weekNotes.filter((n) => !n.tags?.length).length;
+  const totalSaved = await Notes.countDocuments({ userId });
+
+  const listed = sections.savedThisWeek ? weekNotes.slice(0, NOTES_IN_DIGEST) : [];
 
   const templateData: WeeklyDigestData = {
     username,
-    noteCount: recentNotes.length,
-    notes: recentNotes.map((n) => ({
+    dateRange: formatRange(oneWeekAgo, now, timeZone),
+    savedThisWeek: weekNotes.length,
+    untaggedThisWeek,
+    totalSaved,
+    notes: listed.map((n) => ({
       title: n.title,
-      content: n.content,
-      createdAt: new Date(n.createdAt).toLocaleDateString("en-US", {
-        month: "short",
-        day: "numeric",
-      }),
+      url: n.content,
+      type: noteType(n.content),
+      source: n.sourceDomain,
+      // Weekday in the reader's timezone, not the server's.
+      savedOn: new Intl.DateTimeFormat("en-US", {
+        timeZone,
+        weekday: "long",
+      }).format(new Date(n.createdAt)),
     })),
+    moreCount: Math.max(0, weekNotes.length - listed.length),
+    // Generating these needs an LLM pass over saved content; until that exists
+    // the section stays empty and therefore never renders.
+    recallQuestions: [],
+    sections,
     unsubscribeUrl: generateUnsubscribeUrl(userId, email, "digest"),
     dashboardUrl: `${CORS_ORIGINS}/dashboard`,
+    settingsUrl: `${CORS_ORIGINS}/settings/email`,
   };
+
+  // An empty week is not worth an email.
+  if (weekNotes.length === 0) {
+    return false;
+  }
 
   const html = buildWeeklyDigestHtml(templateData);
 
   const { error } = await getResend().emails.send({
     from: EMAIL_FROM,
     to: email,
-    subject: `🧠 Your Weekly Brain Digest — ${recentNotes.length} note${recentNotes.length !== 1 ? "s" : ""} saved`,
+    subject: `Your week, organized — ${weekNotes.length} save${weekNotes.length === 1 ? "" : "s"}`,
     html,
   });
 
@@ -112,6 +171,8 @@ export async function sendWeeklyDigest(
     { clerkUserId: userId },
     { lastDigestSentAt: new Date() },
   );
+
+  return true;
 }
 
 // ─── Feature Announcement ───────────────────────────────────────────
@@ -162,6 +223,8 @@ export async function sendFeatureAnnouncement(params: {
         body: params.body,
         ctaText: params.ctaText,
         ctaUrl: params.ctaUrl,
+        dashboardUrl: `${CORS_ORIGINS}/dashboard`,
+        settingsUrl: `${CORS_ORIGINS}/settings/email`,
         unsubscribeUrl: generateUnsubscribeUrl(
           user.clerkUserId,
           user.email,
@@ -215,6 +278,7 @@ export async function sendWelcomeEmail(
   const templateData: WelcomeData = {
     username,
     dashboardUrl: `${CORS_ORIGINS}/dashboard`,
+    settingsUrl: `${CORS_ORIGINS}/settings/email`,
     unsubscribeUrl: generateUnsubscribeUrl(userId, email, "all"),
   };
 

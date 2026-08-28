@@ -38,7 +38,14 @@ export function AdminEmail() {
     } catch (err: unknown) {
       setStatus("error");
       if (axios.isAxiosError(err)) {
-        setResult({ msg: err.response?.data?.msg || err.message });
+        // The route 404s for non-admins so it gives nothing away, which would
+        // otherwise surface here as a confusing "Not found".
+        setResult({
+          msg:
+            err.response?.status === 404
+              ? "Your account isn't on the admin allowlist."
+              : err.response?.data?.msg || err.message,
+        });
       } else if (err instanceof Error) {
         setResult({ msg: err.message });
       } else {

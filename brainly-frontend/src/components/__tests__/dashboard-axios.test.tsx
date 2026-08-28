@@ -18,6 +18,7 @@ const userMock = {
 vi.mock("@clerk/react", () => ({
   useAuth: () => ({ getToken: getTokenMock }),
   useUser: () => ({ user: userMock }),
+  useClerk: () => ({ signOut: vi.fn() }),
 }));
 
 describe("Dashboard axios connectivity", () => {
