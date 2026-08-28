@@ -4,6 +4,7 @@ import axios from "axios";
 import { Dashboard } from "../dashboard";
 import { API_URL } from "../../config";
 import { MemoryRouter } from "react-router-dom";
+import { ThemeProvider } from "../../theme/ThemeProvider";
 
 vi.mock("axios");
 
@@ -17,7 +18,6 @@ const userMock = {
 vi.mock("@clerk/react", () => ({
   useAuth: () => ({ getToken: getTokenMock }),
   useUser: () => ({ user: userMock }),
-  UserButton: () => null,
 }));
 
 describe("Dashboard axios connectivity", () => {
@@ -25,9 +25,11 @@ describe("Dashboard axios connectivity", () => {
     vi.mocked(axios.get).mockResolvedValueOnce({ data: { post: [] } });
 
     render(
-    <MemoryRouter>
-      <Dashboard />
-    </MemoryRouter>
+    <ThemeProvider>
+      <MemoryRouter>
+        <Dashboard />
+      </MemoryRouter>
+    </ThemeProvider>
     );
 
     await waitFor(() =>
@@ -38,7 +40,7 @@ describe("Dashboard axios connectivity", () => {
     );
 
     expect(
-      screen.getByText(/No notes found in this category/i),
+      screen.getByText(/Nothing here yet/i),
     ).toBeInTheDocument();
   });
 });

@@ -6,6 +6,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Brain Expo</title>
     <script async src="https://platform.twitter.com/widgets.js"></script>
+    <!-- Paint the stored theme before first render so dark mode never flashes white. -->
+    <script>
+      (function () {
+        try {
+          var stored = localStorage.getItem('brain-expo-theme');
+          var dark =
+            stored === 'dark' ||
+            ((stored === 'system' || !stored) &&
+              window.matchMedia('(prefers-color-scheme: dark)').matches);
+          document.documentElement.classList.toggle('dark', dark);
+          document.documentElement.style.colorScheme = dark ? 'dark' : 'light';
+        } catch (e) {}
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

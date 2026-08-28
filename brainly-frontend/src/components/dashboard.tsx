@@ -1,35 +1,71 @@
 import axios from "axios";
-import { useAuth, useUser, UserButton } from "@clerk/react";
-import { Button } from "./button";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth, useUser } from "@clerk/react";
+import {
+  LuArrowUpDown,
+  LuInbox,
+  LuLayoutGrid,
+  LuList,
+  LuPlus,
+  LuSearch,
+  LuSettings,
+  LuShare2,
+  LuSparkles,
+} from "react-icons/lu";
 import { Sidebar } from "./sidebar";
 import type { ContentFilter } from "./sidebar";
 import { Card } from "./card";
-import { PlusIcon } from "../icons/plus";
-import { ShareIcon } from "../icons/shareIcon";
 import { CreateModal } from "../components/createModal";
 import { ShareModal } from "../components/shareModal";
-import { TwitterIcon } from "../icons/twitterIcon";
-import { VideoIcon } from "../icons/videoIcon";
-import { DocumentIcon } from "../icons/documentIcon";
-import { TagIcon } from "../icons/tagIcon";
-import { BrainIcon } from "../icons/brainIcon";
-import { LinkedinIcon } from "../icons/linkedinIcon"; // Added LinkedinIcon import
-import { useState, useEffect, useCallback, useMemo } from "react";
-import { API_URL } from "../config";
 import { ExtensionBanner } from "./ExtensionBanner";
+import { OnboardingModal } from "./OnboardingModal";
 import { useEmailSync } from "../hooks/useEmailSync";
+import { useOnboardingStatus } from "../hooks/useOnboardingStatus";
+import { getContentType } from "../lib/notes";
+import {
+  createCollection,
+  deleteCollection as deleteCollectionRequest,
+  fetchCollections,
+  fetchTags,
+  patchNote,
+} from "../lib/api";
+import type { Collection, NotePatch, Tag } from "../lib/api";
+import { API_URL } from "../config";
 
 export type Note = {
   _id: string;
   title: string;
   content?: string;
   createdAt: string;
+  tags?: string[];
+  note?: string;
+  collectionId?: string | null;
 };
 
 type CreateNotePayload = {
   title: string;
   link: string;
 };
+
+type SortOrder = "recent" | "oldest" | "title";
+type ViewMode = "grid" | "list";
+
+const SORT_LABELS: Record<SortOrder, string> = {
+  recent: "Recent",
+  oldest: "Oldest",
+  title: "A–Z",
+};
+
+const SORT_CYCLE: SortOrder[] = ["recent", "oldest", "title"];
+
+const CHIPS: { value: ContentFilter; label: string }[] = [
+  { value: "all", label: "All" },
+  { value: "video", label: "Videos" },
+  { value: "tweet", label: "Tweets" },
+  { value: "linkedin", label: "LinkedIn" },
+  { value: "document", label: "Docs" },
+];
 
 const makeOptimisticNote = (data: CreateNotePayload): Note => ({
   _id: `temp-${crypto.randomUUID()}`,
@@ -42,24 +78,80 @@ export const Dashboard = () => {
   const [isModalOpen, setModalOpen] = useState(false);
   const [isShareModalOpen, setShareModalOpen] = useState(false);
   const [notes, setNotes] = useState<Note[]>([]);
+  const [collections, setCollections] = useState<Collection[]>([]);
+  const [tags, setTags] = useState<Tag[]>([]);
   const [activeFilter, setActiveFilter] = useState<ContentFilter>("all");
+  // The sidebar links here from other screens (Settings) with a filter in the
+  // query string, so the first render already honours it.
+  const initialFilter = () => new URLSearchParams(window.location.search);
+  const [activeCollectionId, setActiveCollectionId] = useState<string | null>(
+    () => initialFilter().get("collection"),
+  );
+  const [activeTag, setActiveTag] = useState<string | null>(() =>
+    initialFilter().get("tag"),
+  );
+  const [query, setQuery] = useState("");
+  const [sortOrder, setSortOrder] = useState<SortOrder>("recent");
+  const [viewMode, setViewMode] = useState<ViewMode>("grid");
+  const searchRef = useRef<HTMLInputElement>(null);
+  const navigate = useNavigate();
   const { getToken } = useAuth();
   const { user } = useUser();
 
   // Ensure email preferences exist for this user
   useEmailSync();
 
-  const getContentType = (content: string | undefined): "tweet" | "video" | "document" | "linkedin" => {
-    if (content?.includes("youtube") || content?.includes("youtu.be")) return "video";
-    if (content?.includes("twitter") || content?.includes("x.com")) return "tweet";
-    if (content?.includes("linkedin.com")) return "linkedin";
-    return "document";
-  };
+  // Floats the onboarding card over the dashboard until it's done or skipped.
+  const { status: onboardingStatus, markComplete: markOnboarded } =
+    useOnboardingStatus();
 
-  const filteredNotes = useMemo(() => {
-    if (activeFilter === "all") return notes;
-    return notes.filter((note) => getContentType(note.content) === activeFilter);
-  }, [notes, activeFilter]);
+  // Tags aren't stored yet, so every note counts as unsorted.
+  const inboxCount = useMemo(
+    () => notes.filter((note) => !note.tags?.length).length,
+    [notes],
+  );
+
+  const visibleNotes = useMemo(() => {
+    const needle = query.trim().toLowerCase();
+
+    const matched = notes.filter((note) => {
+      if (activeFilter === "inbox" && note.tags?.length) return false;
+      if (activeCollectionId && note.collectionId !== activeCollectionId) return false;
+      if (activeTag && !note.tags?.includes(activeTag)) return false;
+      if (
+        activeFilter !== "all" &&
+        activeFilter !== "inbox" &&
+        getContentType(note.content) !== activeFilter
+      ) {
+        return false;
+      }
+      if (!needle) return true;
+      return (
+        note.title.toLowerCase().includes(needle) ||
+        note.content?.toLowerCase().includes(needle) ||
+        note.tags?.some((tag) => tag.toLowerCase().includes(needle))
+      );
+    });
+
+    return matched.sort((a, b) => {
+      if (sortOrder === "title") return a.title.localeCompare(b.title);
+      const delta =
+        new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+      return sortOrder === "oldest" ? delta : -delta;
+    });
+  }, [notes, activeFilter, activeCollectionId, activeTag, query, sortOrder]);
+
+  // ⌘K / Ctrl-K jumps to search.
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
+        e.preventDefault();
+        searchRef.current?.focus();
+      }
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, []);
 
   const getData = useCallback(async () => {
     try {
@@ -76,10 +168,31 @@ export const Dashboard = () => {
     }
   }, [getToken]);
 
+  // Collections and tags are derived server-side, so they refresh together
+  // whenever a note's tags or filing change.
+  const getSidebarData = useCallback(async () => {
+    try {
+      const token = await getToken();
+      const [nextCollections, nextTags] = await Promise.all([
+        fetchCollections(token),
+        fetchTags(token),
+      ]);
+      setCollections(nextCollections);
+      setTags(nextTags);
+    } catch (error) {
+      console.error("Error fetching collections and tags:", error);
+    }
+  }, [getToken]);
+
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     getData();
   }, [getData]);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    getSidebarData();
+  }, [getSidebarData]);
 
   const createNote = async (data: CreateNotePayload) => {
     const optimisticNote = makeOptimisticNote(data);
@@ -120,6 +233,53 @@ export const Dashboard = () => {
     }
   };
 
+  /** Optimistic note update, rolled back and re-synced if the request fails. */
+  const updateNote = async (id: string, patch: NotePatch) => {
+    const previousNotes = notes;
+    setNotes((prev) =>
+      prev.map((note) => (note._id === id ? { ...note, ...patch } : note)),
+    );
+
+    try {
+      const token = await getToken();
+      await patchNote(token, id, patch);
+      await getSidebarData();
+    } catch (error) {
+      setNotes(previousNotes);
+      console.error("Error updating note:", error);
+    }
+  };
+
+  const addCollection = async (name: string) => {
+    try {
+      const token = await getToken();
+      await createCollection(token, name);
+      await getSidebarData();
+    } catch (error) {
+      console.error("Error creating collection:", error);
+    }
+  };
+
+  const removeCollection = async (id: string) => {
+    const previousNotes = notes;
+    // Deleting a collection never deletes its notes; they fall back to Inbox.
+    setNotes((prev) =>
+      prev.map((note) =>
+        note.collectionId === id ? { ...note, collectionId: null } : note,
+      ),
+    );
+    if (activeCollectionId === id) setActiveCollectionId(null);
+
+    try {
+      const token = await getToken();
+      await deleteCollectionRequest(token, id);
+      await getSidebarData();
+    } catch (error) {
+      setNotes(previousNotes);
+      console.error("Error deleting collection:", error);
+    }
+  };
+
   const SyncUser = useCallback(async () => {
     if (!user) return;
     try {
@@ -141,16 +301,43 @@ export const Dashboard = () => {
     SyncUser();
   }, [SyncUser]);
 
+  const cycleSort = () =>
+    setSortOrder(
+      (prev) => SORT_CYCLE[(SORT_CYCLE.indexOf(prev) + 1) % SORT_CYCLE.length],
+    );
+
   return (
-    <div className="flex min-h-screen bg-gray-50 pb-[80px] md:pb-0 relative">
+    <div className="relative flex min-h-screen bg-bg pb-24 md:pb-0">
       <div className="hidden md:block">
-        <Sidebar activeFilter={activeFilter} onFilterChange={setActiveFilter} />
+        <Sidebar
+          activeFilter={activeFilter}
+          onFilterChange={(filter) => {
+            setActiveFilter(filter);
+            setActiveCollectionId(null);
+            setActiveTag(null);
+          }}
+          inboxCount={inboxCount}
+          collections={collections}
+          tags={tags}
+          activeCollectionId={activeCollectionId}
+          activeTag={activeTag}
+          onSelectCollection={(id) => {
+            setActiveCollectionId(id);
+            setActiveFilter("all");
+          }}
+          onSelectTag={(tag) => {
+            setActiveTag(tag);
+            setActiveFilter("all");
+          }}
+          onCreateCollection={addCollection}
+          onDeleteCollection={removeCollection}
+        />
       </div>
+
       <CreateModal
         isOpen={isModalOpen}
         onClose={() => setModalOpen(false)}
         onSubmit={(data) => {
-          console.log(data);
           createNote(data);
           SyncUser();
           setModalOpen(false);
@@ -160,156 +347,236 @@ export const Dashboard = () => {
         isOpen={isShareModalOpen}
         onClose={() => setShareModalOpen(false)}
         itemCount={notes.length}
+        notes={notes}
+        collections={collections}
+        tags={tags}
+        activeCollectionId={activeCollectionId}
+        activeTag={activeTag}
       />
 
+      {onboardingStatus === "needed" && (
+        <OnboardingModal
+          onDone={() => {
+            markOnboarded();
+            // Topics become collections, so the sidebar needs a refresh.
+            getSidebarData();
+          }}
+        />
+      )}
+
       {/* Content */}
-      <div className="md:ml-64 flex-1 p-4 md:p-8 w-full max-w-full overflow-x-hidden">
-        <ExtensionBanner />
-        
+      <div className="w-full max-w-full flex-1 overflow-x-hidden p-4 md:ml-64 md:p-8">
         {/* Mobile Header (Hidden on Desktop) */}
-        <div className="flex md:hidden items-center justify-between mb-8 pb-4 border-b border-gray-100">
+        <div className="mb-5 flex items-center justify-between border-b border-line pb-4 md:hidden">
           <div className="flex items-center gap-2">
-            <span className="text-purple-600 bg-purple-100 rounded-xl p-1.5 flex items-center justify-center">
-              <BrainIcon size="lg" />
+            <span className="text-accent">
+              <LuSparkles size={18} />
             </span>
-            <h1 className="text-xl font-bold text-gray-900 tracking-tight">Brain Expo</h1>
+            <h1 className="text-lg font-bold tracking-tight text-fg">Brain Expo</h1>
           </div>
-          <div className="flex shrink-0 p-1 bg-purple-50 rounded-full">
-            <UserButton />
+          <button
+            type="button"
+            onClick={() => navigate("/settings/profile")}
+            title="Settings"
+            aria-label="Settings"
+            className="rounded-lg p-2 text-fg-muted transition-colors hover:bg-surface-hover hover:text-fg cursor-pointer"
+          >
+            <LuSettings size={18} />
+          </button>
+        </div>
+
+        <ExtensionBanner />
+
+        {/* Search + primary action */}
+        <div className="mb-5 flex items-center gap-3">
+          <div className="relative flex-1">
+            <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-fg-subtle">
+              <LuSearch size={17} />
+            </span>
+            <input
+              ref={searchRef}
+              type="search"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Search titles, notes, tags"
+              aria-label="Search titles, notes, tags"
+              className="w-full rounded-xl border border-line bg-surface py-3 pl-12 pr-16 text-sm text-fg placeholder:text-fg-subtle outline-none transition-colors focus:border-accent"
+            />
+            <kbd className="pointer-events-none absolute right-3 top-1/2 hidden -translate-y-1/2 rounded-md border border-line px-1.5 py-0.5 text-[11px] font-medium text-fg-subtle sm:block">
+              ⌘K
+            </kbd>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => setModalOpen(true)}
+            className="hidden shrink-0 items-center gap-2 rounded-xl bg-accent px-5 py-3 text-sm font-semibold text-accent-fg transition-colors hover:bg-accent-hover md:flex cursor-pointer"
+          >
+            <LuPlus size={17} />
+            Add
+          </button>
+          <button
+            type="button"
+            onClick={() => setShareModalOpen(true)}
+            title="Share brain"
+            aria-label="Share brain"
+            className="hidden shrink-0 rounded-xl border border-line bg-surface p-3 text-fg-muted transition-colors hover:text-fg md:block cursor-pointer"
+          >
+            <LuShare2 size={17} />
+          </button>
+        </div>
+
+        {/* Filter chips + sort / view */}
+        <div className="mb-5 flex items-center justify-between gap-4 border-b border-line pb-4">
+          <div className="scrollbar-hide -mx-1 flex gap-2 overflow-x-auto px-1">
+            {CHIPS.map((chip) => (
+              <button
+                key={chip.value}
+                type="button"
+                onClick={() => setActiveFilter(chip.value)}
+                className={`shrink-0 rounded-full border px-4 py-1.5 text-sm font-medium transition-colors cursor-pointer ${
+                  activeFilter === chip.value
+                    ? "border-fg bg-fg text-bg"
+                    : "border-line text-fg-muted hover:border-line-strong hover:text-fg"
+                }`}
+              >
+                {chip.label}
+              </button>
+            ))}
+          </div>
+
+          <div className="flex shrink-0 items-center gap-1">
+            <button
+              type="button"
+              onClick={cycleSort}
+              title="Change sort order"
+              className="flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-sm font-medium text-fg-muted transition-colors hover:bg-surface-hover hover:text-fg cursor-pointer"
+            >
+              <LuArrowUpDown size={15} />
+              <span className="hidden sm:inline">{SORT_LABELS[sortOrder]}</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setViewMode(viewMode === "grid" ? "list" : "grid")}
+              title={`Switch to ${viewMode === "grid" ? "list" : "grid"} view`}
+              aria-label={`Switch to ${viewMode === "grid" ? "list" : "grid"} view`}
+              className="rounded-lg p-2 text-fg-muted transition-colors hover:bg-surface-hover hover:text-fg cursor-pointer"
+            >
+              {viewMode === "grid" ? <LuLayoutGrid size={16} /> : <LuList size={16} />}
+            </button>
           </div>
         </div>
 
-        {/* Section Header */}
-        <div className="flex items-center justify-between mb-4 md:mb-8">
-          <h2 className="text-2xl font-bold text-gray-900">
-            All Notes
-          </h2>
-          <div className="flex gap-2 md:gap-3">
-            <div className="bg-purple-50 text-purple-700 hover:bg-purple-100 flex items-center gap-1.5 px-3 py-1.5 md:px-4 md:py-2 rounded-lg cursor-pointer transition-colors text-sm font-medium" onClick={() => setShareModalOpen(true)}>
-              <ShareIcon size="sm" />
-              <span>Share Brain</span>
-            </div>
-            <div className="hidden md:block">
-              <Button
-                varient="primary"
-                size="md"
-                text="Add Content"
-                startIcon={<PlusIcon size="sm" />}
-                onClick={() => setModalOpen(true)}
-              />
-            </div>
+        {/* Active collection / tag filter */}
+        {(activeCollectionId || activeTag) && (
+          <div className="mb-4 flex items-center gap-2 text-sm">
+            <span className="text-fg-muted">Filtered by</span>
+            <span className="rounded-full bg-tag px-2.5 py-1 text-xs font-medium text-tag-fg">
+              {activeCollectionId
+                ? collections.find((c) => c._id === activeCollectionId)?.name
+                : `#${activeTag}`}
+            </span>
+            <button
+              type="button"
+              onClick={() => {
+                setActiveCollectionId(null);
+                setActiveTag(null);
+              }}
+              className="text-xs text-fg-subtle underline-offset-2 hover:underline cursor-pointer"
+            >
+              clear
+            </button>
           </div>
-        </div>
-
-        {/* Mobile view headers */}
-        <div className="flex md:hidden gap-2 overflow-x-auto pb-4 mb-2 -mx-4 px-4 scrollbar-hide">
-          <button 
-            onClick={() => setActiveFilter("all")}
-            className={`whitespace-nowrap px-4 py-1.5 rounded-full text-sm font-medium border transition-colors ${activeFilter === "all" ? "bg-purple-600 text-white border-purple-600 shadow-sm" : "bg-white text-gray-600 border-gray-200"}`}
-          >
-            All
-          </button>
-          <button 
-            onClick={() => setActiveFilter("tweet")}
-            className={`whitespace-nowrap px-4 py-1.5 rounded-full text-sm font-medium border transition-colors ${activeFilter === "tweet" ? "bg-purple-600 text-white border-purple-600 shadow-sm" : "bg-white text-gray-600 border-gray-200"}`}
-          >
-            Tweets
-          </button>
-          <button 
-            onClick={() => setActiveFilter("video")}
-            className={`whitespace-nowrap px-4 py-1.5 rounded-full text-sm font-medium border transition-colors ${activeFilter === "video" ? "bg-purple-600 text-white border-purple-600 shadow-sm" : "bg-white text-gray-600 border-gray-200"}`}
-          >
-            Videos
-          </button>
-          <button 
-            onClick={() => setActiveFilter("linkedin")}
-            className={`whitespace-nowrap px-4 py-1.5 rounded-full text-sm font-medium border transition-colors ${activeFilter === "linkedin" ? "bg-purple-600 text-white border-purple-600 shadow-sm" : "bg-white text-gray-600 border-gray-200"}`}
-          >
-            LinkedIn
-          </button>
-          <button 
-            onClick={() => setActiveFilter("document")}
-            className={`whitespace-nowrap px-4 py-1.5 rounded-full text-sm font-medium border transition-colors ${activeFilter === "document" ? "bg-purple-600 text-white border-purple-600 shadow-sm" : "bg-white text-gray-600 border-gray-200"}`}
-          >
-            Docs
-          </button>
-        </div>
+        )}
 
         {/* Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-          {filteredNotes.length === 0 ? (
-            <div className="col-span-full py-10 text-center text-gray-500">
-              No notes found in this category.
-            </div>
-          ) : (
-            filteredNotes.map((note) => (
+        {visibleNotes.length === 0 ? (
+          <div className="flex flex-col items-center gap-2 rounded-xl border border-dashed border-line py-20 text-center">
+            <span className="text-fg-subtle">
+              <LuInbox size={26} />
+            </span>
+            <p className="text-sm font-medium text-fg">
+              {query ? `No matches for “${query}”` : "Nothing here yet"}
+            </p>
+            <p className="text-sm text-fg-muted">
+              {query
+                ? "Try a different search or clear the filter."
+                : "Save a link and it will show up here."}
+            </p>
+          </div>
+        ) : (
+          <div
+            className={
+              viewMode === "grid"
+                ? "grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3"
+                : "flex flex-col gap-4"
+            }
+          >
+            {visibleNotes.map((note) => (
               <Card
                 key={note._id}
                 title={note.title}
                 type={getContentType(note.content)}
                 content={note.content}
-                tags={["content"]}
+                note={note.note}
+                tags={note.tags ?? []}
+                createdAt={note.createdAt}
                 addedDate={new Date(note.createdAt).toLocaleDateString()}
+                collections={collections}
+                collectionId={note.collectionId ?? null}
+                onTagsChange={(next) => updateNote(note._id, { tags: next })}
+                onCollectionChange={(next) =>
+                  updateNote(note._id, { collectionId: next })
+                }
                 onDelete={() => deleteNote(note._id)}
                 onShare={() => {
                   if (!note.content) return;
                   navigator.clipboard.writeText(note.content);
                 }}
               />
-            ))
-          )}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Floating Action Button (FAB for Mobile) */}
-      <div className="md:hidden fixed bottom-24 right-6 z-40">
-        <button 
-          onClick={() => setModalOpen(true)}
-          className="bg-purple-600 text-white rounded-full p-4 shadow-lg hover:bg-purple-700 active:scale-95 transition-transform flex items-center justify-center h-14 w-14"
-        >
-          <div className="scale-125">
-            <PlusIcon size="md" />
-          </div>
-        </button>
-      </div>
+      <button
+        onClick={() => setModalOpen(true)}
+        aria-label="Add content"
+        className="fixed bottom-24 right-6 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-accent text-accent-fg shadow-lg transition-transform hover:bg-accent-hover active:scale-95 md:hidden cursor-pointer"
+      >
+        <LuPlus size={24} />
+      </button>
 
-      {/* Mobile Bottom Navigation Component */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-6 py-2 pb-5 z-40 flex justify-between items-center shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
-        <div 
-          onClick={() => setActiveFilter("tweet")}
-          className={`flex flex-col items-center gap-1 min-w-[64px] ${activeFilter === "tweet" ? "text-purple-600" : "text-gray-400"} cursor-pointer hover:text-purple-500 transition-colors`}
+      {/* Mobile Bottom Navigation */}
+      <nav className="fixed bottom-0 left-0 right-0 z-40 flex items-center justify-around border-t border-line bg-surface px-4 pb-5 pt-2 md:hidden">
+        {[
+          { value: "all" as const, label: "All", icon: <LuLayoutGrid size={19} /> },
+          { value: "inbox" as const, label: "Inbox", icon: <LuInbox size={19} /> },
+          { value: "video" as const, label: "Videos", icon: <LuLayoutGrid size={19} /> },
+          { value: "document" as const, label: "Docs", icon: <LuList size={19} /> },
+        ].map((item) => (
+          <button
+            key={item.value}
+            type="button"
+            onClick={() => setActiveFilter(item.value)}
+            className={`flex min-w-[64px] flex-col items-center gap-1 transition-colors cursor-pointer ${
+              activeFilter === item.value ? "text-accent" : "text-fg-subtle"
+            }`}
+          >
+            {item.icon}
+            <span className="text-[10px] font-medium tracking-wide">{item.label}</span>
+          </button>
+        ))}
+        <button
+          type="button"
+          onClick={() => setShareModalOpen(true)}
+          className="flex min-w-[64px] flex-col items-center gap-1 text-fg-subtle transition-colors cursor-pointer"
         >
-          <TwitterIcon size="md" />
-          <span className="text-[10px] font-medium tracking-wide">Tweets</span>
-        </div>
-        <div 
-          onClick={() => setActiveFilter("video")}
-          className={`flex flex-col items-center gap-1 min-w-[64px] ${activeFilter === "video" ? "text-purple-600" : "text-gray-400"} cursor-pointer hover:text-purple-500 transition-colors`}
-        >
-          <VideoIcon size="md" />
-          <span className="text-[10px] font-medium tracking-wide">Videos</span>
-        </div>
-        <div 
-          onClick={() => setActiveFilter("linkedin")}
-          className={`flex flex-col items-center gap-1 min-w-[64px] ${activeFilter === "linkedin" ? "text-purple-600" : "text-gray-400"} cursor-pointer hover:text-purple-500 transition-colors`}
-        >
-          <LinkedinIcon size="md" />
-          <span className="text-[10px] font-medium tracking-wide">LinkedIn</span>
-        </div>
-        <div 
-          onClick={() => setActiveFilter("document")}
-          className={`flex flex-col items-center gap-1 min-w-[64px] ${activeFilter === "document" ? "text-purple-600" : "text-gray-400"} cursor-pointer hover:text-purple-500 transition-colors`}
-        >
-          <DocumentIcon size="md" />
-          <span className="text-[10px] font-medium tracking-wide">Docs</span>
-        </div>
-        <div 
-          className="flex flex-col items-center gap-1 min-w-[64px] text-gray-400 cursor-pointer hover:text-purple-500 transition-colors"
-        >
-          <TagIcon size="md" />
-          <span className="text-[10px] font-medium tracking-wide">Tags</span>
-        </div>
-      </div>
+          <LuShare2 size={19} />
+          <span className="text-[10px] font-medium tracking-wide">Share</span>
+        </button>
+      </nav>
     </div>
   );
 };

@@ -1,6 +1,7 @@
 import dotenv from "dotenv";
 import mongoose from "mongoose";
 import { createApp } from "./app.js";
+import { Links } from "./models/notes.js";
 import { startWeeklyDigestCron } from "./cron/weeklyDigest.js";
 
 dotenv.config();
@@ -38,11 +39,27 @@ async function connectDatabase() {
   throw new Error("MONGO_URI must be set in production");
 }
 
+/**
+ * Links written before sharing was scoped exposed every note, which is exactly
+ * what `scope: "all"` means. Idempotent, so it is safe on every boot.
+ */
+async function backfillShareScopes() {
+  const { modifiedCount } = await Links.updateMany(
+    { scope: { $exists: false } },
+    { $set: { scope: "all", noteIds: [], revokedAt: null } },
+  );
+
+  if (modifiedCount) {
+    console.log(`Backfilled scope on ${modifiedCount} share link(s)`);
+  }
+}
+
 async function startServer() {
   const app = createApp();
 
   try {
     await connectDatabase();
+    await backfillShareScopes();
     startWeeklyDigestCron();
   } catch (err) {
     console.error("Error while connecting to MongoDB:", err);

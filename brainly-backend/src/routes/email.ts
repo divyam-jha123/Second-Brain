@@ -1,6 +1,11 @@
 import { Router, Request, Response } from "express";
 import { requireAuth, getAuth } from "../middlewares/auth.js";
 import { EmailPreference } from "../models/emailPreference.js";
+import {
+  DEFAULT_PREFS,
+  getOrCreateEmailPrefs,
+  serializePrefs,
+} from "../services/emailPreferences.js";
 import { User } from "../models/user.js";
 import { sendFeatureAnnouncement } from "../services/emailService.js";
 
@@ -18,33 +23,14 @@ router.get(
         return res.status(401).json({ msg: "Not authenticated" });
       }
 
-      let pref = await EmailPreference.findOne({ clerkUserId: userId });
+      const pref = await getOrCreateEmailPrefs(userId, {
+        email: req.query.email as string | undefined,
+        timezone: req.query.timezone as string | undefined,
+      });
 
-      // Auto-create preferences if they don't exist yet
-      if (!pref) {
-        const user = await User.findOne({ clerkUserId: userId });
-        const email = req.query.email as string || user?.email;
-        
-        if (!email) {
-            // We can't auto-create without an email, but we shouldn't throw 404 on GET.
-            // Just return default preferences conceptually.
-            return res.json({
-                preferences: { featureAnnouncements: true, weeklyDigest: true, unsubscribedAll: false }
-            });
-        }
-
-        pref = await EmailPreference.create({
-          clerkUserId: userId,
-          email: email,
-        });
-      }
-
+      // No address on file yet — report defaults rather than 404 a settings page.
       return res.json({
-        preferences: {
-          featureAnnouncements: pref.featureAnnouncements,
-          weeklyDigest: pref.weeklyDigest,
-          unsubscribedAll: pref.unsubscribedAll,
-        },
+        preferences: pref ? serializePrefs(pref) : DEFAULT_PREFS,
       });
     } catch (error) {
       console.error("Error fetching email preferences:", error);
@@ -59,13 +45,22 @@ router.put(
   requireAuth(),
   async (req: Request, res: Response) => {
     try {
+      // Identity comes from the session only; a user id in the body is ignored.
       const { userId } = getAuth(req);
 
       if (!userId) {
         return res.status(401).json({ msg: "Not authenticated" });
       }
 
-      const { featureAnnouncements, weeklyDigest, email } = req.body;
+      const {
+        featureAnnouncements,
+        weeklyDigest,
+        digestSections,
+        digestDay,
+        digestHour,
+        timezone,
+        email,
+      } = req.body;
 
       let targetEmail = email;
       if (!targetEmail) {
@@ -77,26 +72,45 @@ router.put(
         return res.status(400).json({ msg: "Email must be provided or synced first" });
       }
 
+      const update: Record<string, unknown> = {
+        clerkUserId: userId,
+        email: targetEmail,
+        ...(typeof featureAnnouncements === "boolean" && { featureAnnouncements }),
+        ...(typeof digestDay === "number" && { digestDay }),
+        ...(typeof digestHour === "number" && { digestHour }),
+        ...(typeof timezone === "string" && timezone && { timezone }),
+      };
+
+      // Section checkboxes only pick what a digest contains. Clearing all three
+      // is not an unsubscribe — that is the weekly toggle's job alone.
+      if (digestSections && typeof digestSections === "object") {
+        for (const key of ["savedThisWeek", "untaggedNudge", "recallQuestions"]) {
+          if (typeof digestSections[key] === "boolean") {
+            update[`digestSections.${key}`] = digestSections[key];
+          }
+        }
+      }
+
+      if (typeof weeklyDigest === "boolean") {
+        update.weeklyDigest = weeklyDigest;
+        if (weeklyDigest) {
+          update.consentedAt = new Date();
+          update.unsubscribedAt = null;
+          update.unsubscribedAll = false;
+        } else {
+          update.unsubscribedAt = new Date();
+        }
+      }
+
       const pref = await EmailPreference.findOneAndUpdate(
         { clerkUserId: userId },
-        {
-          clerkUserId: userId,
-          email: targetEmail,
-          ...(typeof featureAnnouncements === "boolean" && {
-            featureAnnouncements,
-          }),
-          ...(typeof weeklyDigest === "boolean" && { weeklyDigest }),
-        },
-        { upsert: true, new: true },
+        update,
+        { upsert: true, new: true, setDefaultsOnInsert: true },
       );
 
       return res.json({
         msg: "Preferences updated",
-        preferences: {
-          featureAnnouncements: pref.featureAnnouncements,
-          weeklyDigest: pref.weeklyDigest,
-          unsubscribedAll: pref.unsubscribedAll,
-        },
+        preferences: serializePrefs(pref),
       });
     } catch (error) {
       console.error("Error updating email preferences:", error);
@@ -104,6 +118,19 @@ router.put(
     }
   },
 );
+
+// ─── POST /email/send-now ───────────────────────────────────────────
+// TODO: send the weekly digest on demand. The cron and the digest template are
+// a separate task; the settings page wires the button against this contract.
+router.post("/send-now", requireAuth(), async (req: Request, res: Response) => {
+  const { userId } = getAuth(req);
+
+  if (!userId) {
+    return res.status(401).json({ msg: "Not authenticated" });
+  }
+
+  return res.status(501).json({ msg: "Preview sending isn't built yet" });
+});
 
 // ─── POST /email/send-announcement ──────────────────────────────────
 router.post(

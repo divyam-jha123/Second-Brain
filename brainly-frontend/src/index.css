@@ -1,10 +1,103 @@
 @import "tailwindcss";
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap');
 
+/* Class-based dark mode: <html class="dark"> is set by ThemeProvider. */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ---------------------------------------------------------------------------
+   Semantic palette. Every colour the app uses is named by role, never by hue,
+   so the dark override below is the only place the second theme lives.
+--------------------------------------------------------------------------- */
+:root {
+  --bg: #ffffff;
+  --surface: #fafaf9;
+  --surface-hover: #f2f2f0;
+  --card: #ffffff;
+  --card-hover: #fafafa;
+  --line: #e7e5e4;
+  --line-strong: #d6d3d1;
+
+  --fg: #12110f;
+  --fg-muted: #57534e;
+  --fg-subtle: #a8a29e;
+
+  --accent: #2f6fed;
+  --accent-hover: #2560d8;
+  --accent-fg: #ffffff;
+  --accent-soft: #e8f0ff;
+  --accent-soft-fg: #1d4ed8;
+
+  --tag: #ede9fe;
+  --tag-fg: #5b45d6;
+
+  --danger: #dc2626;
+  --danger-soft: #fee2e2;
+
+  --overlay: rgb(24 24 27 / 0.45);
+}
+
+.dark {
+  --bg: #0d0d0e;
+  --surface: #141416;
+  --surface-hover: #1e1e21;
+  --card: #161618;
+  --card-hover: #1c1c1f;
+  --line: #26262a;
+  --line-strong: #35353b;
+
+  --fg: #f4f4f5;
+  --fg-muted: #a1a1aa;
+  --fg-subtle: #6b6b73;
+
+  --accent: #3b7bf5;
+  --accent-hover: #5a91f7;
+  --accent-fg: #ffffff;
+  --accent-soft: #16233d;
+  --accent-soft-fg: #8ab2fb;
+
+  --tag: #2a2350;
+  --tag-fg: #a99cf5;
+
+  --danger: #f87171;
+  --danger-soft: #3a1c1c;
+
+  --overlay: rgb(0 0 0 / 0.65);
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-hover: var(--surface-hover);
+  --color-card: var(--card);
+  --color-card-hover: var(--card-hover);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+
+  --color-fg: var(--fg);
+  --color-fg-muted: var(--fg-muted);
+  --color-fg-subtle: var(--fg-subtle);
+
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-fg: var(--accent-fg);
+  --color-accent-soft: var(--accent-soft);
+  --color-accent-soft-fg: var(--accent-soft-fg);
+
+  --color-tag: var(--tag);
+  --color-tag-fg: var(--tag-fg);
+
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+
+  --color-overlay: var(--overlay);
+}
+
 body {
   font-family: 'Inter', sans-serif;
   margin: 0;
   padding: 0;
+  background: var(--bg);
+  color: var(--fg);
 }
 
 /* Manrope — geometric, rounded display face for the hero headings. */
@@ -131,8 +224,8 @@ body {
   justify-content: space-between;
   gap: 16px;
   padding: 14px 20px;
-  background: #f0ede6;
-  border: 1px solid rgba(15, 14, 12, 0.1);
+  background: var(--surface-hover);
+  border: 1px solid var(--line);
   border-radius: 12px;
   margin-bottom: 24px;
   flex-wrap: wrap;
@@ -152,13 +245,13 @@ body {
 .extension-banner__title {
   font-size: 14px;
   font-weight: 500;
-  color: #0f0e0c;
+  color: var(--fg);
   margin: 0;
 }
 
 .extension-banner__subtitle {
   font-size: 12px;
-  color: #4a4842;
+  color: var(--fg-muted);
   margin: 2px 0 0;
 }
 
@@ -172,8 +265,8 @@ body {
 .btn-banner-primary {
   font-size: 13px;
   font-weight: 500;
-  color: #fff;
-  background: #0f0e0c;
+  color: var(--accent-fg);
+  background: var(--accent);
   border: none;
   border-radius: 8px;
   padding: 8px 14px;
@@ -188,7 +281,7 @@ body {
 
 .btn-banner-dismiss {
   font-size: 14px;
-  color: #9b9690;
+  color: var(--fg-subtle);
   background: none;
   border: none;
   cursor: pointer;
@@ -197,7 +290,7 @@ body {
 }
 
 .btn-banner-dismiss:hover {
-  color: #0f0e0c;
+  color: var(--fg);
 }
 
 .settings-page {
@@ -214,7 +307,7 @@ body {
 
 .settings-header p {
   font-size: 14px;
-  color: #4a4842;
+  color: var(--fg-muted);
   margin-bottom: 32px;
 }
 
@@ -230,15 +323,15 @@ body {
 
 .settings-section__desc {
   font-size: 13px;
-  color: #4a4842;
+  color: var(--fg-muted);
   margin-bottom: 16px;
 }
 
 .ext-card {
-  border: 1px solid rgba(15, 14, 12, 0.1);
+  border: 1px solid var(--line);
   border-radius: 12px;
   padding: 20px;
-  background: #faf9f6;
+  background: var(--card);
 }
 
 .ext-card__status-row {
@@ -264,7 +357,7 @@ body {
 }
 
 .ext-dot--gray {
-  background: #9b9690;
+  background: var(--fg-subtle);
 }
 
 .ext-card__status-label {
@@ -274,13 +367,13 @@ body {
 
 .ext-card__desc {
   font-size: 13px;
-  color: #4a4842;
+  color: var(--fg-muted);
   margin-bottom: 16px;
   line-height: 1.6;
 }
 
 .ext-card__tips {
-  background: #f0ede6;
+  background: var(--surface-hover);
   border-radius: 8px;
   padding: 12px 16px;
   margin-bottom: 16px;
@@ -298,7 +391,7 @@ body {
 
 .ext-card__tips li {
   font-size: 12px;
-  color: #4a4842;
+  color: var(--fg-muted);
   line-height: 1.8;
 }
 
@@ -316,15 +409,15 @@ body {
   align-items: flex-start;
   gap: 10px;
   font-size: 13px;
-  color: #4a4842;
+  color: var(--fg-muted);
 }
 
 .step-num {
   width: 20px;
   height: 20px;
   border-radius: 50%;
-  background: #0f0e0c;
-  color: #fff;
+  background: var(--accent);
+  color: var(--accent-fg);
   font-size: 11px;
   font-weight: 600;
   display: flex;
@@ -335,7 +428,7 @@ body {
 }
 
 .ext-link {
-  color: #0f0e0c;
+  color: var(--fg);
   font-weight: 500;
   text-decoration: underline;
   text-underline-offset: 2px;
@@ -347,8 +440,8 @@ body {
   gap: 8px;
   font-size: 14px;
   font-weight: 500;
-  color: #fff;
-  background: #0f0e0c;
+  color: var(--accent-fg);
+  background: var(--accent);
   border-radius: 10px;
   padding: 10px 18px;
   text-decoration: none;
@@ -367,7 +460,7 @@ body {
 
 .ext-card__note {
   font-size: 11px;
-  color: #9b9690;
+  color: var(--fg-subtle);
 }
 
 /* Email preference toggle switch */
@@ -389,7 +482,7 @@ body {
 .email-toggle__slider {
   position: absolute;
   inset: 0;
-  background: #d1d5db;
+  background: var(--line-strong);
   border-radius: 24px;
   transition: background 0.25s ease;
 }
@@ -408,7 +501,7 @@ body {
 }
 
 .email-toggle input:checked + .email-toggle__slider {
-  background: #7c3aed;
+  background: var(--accent);
 }
 
 .email-toggle input:checked + .email-toggle__slider::before {
@@ -418,4 +511,13 @@ body {
 .email-toggle input:disabled + .email-toggle__slider {
   opacity: 0.5;
   cursor: not-allowed;
+}
+/* Horizontal chip rows scroll without showing a scrollbar. */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
 }

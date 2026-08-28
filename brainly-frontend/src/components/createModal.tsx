@@ -44,20 +44,20 @@ export const CreateModal = ({ isOpen, onClose, onSubmit }: CreateModalProps) => 
 
     return (
         <div
-            className="fixed inset-0 bg-black/60 flex items-center justify-center z-50"
+            className="fixed inset-0 bg-overlay flex items-center justify-center z-50"
             onClick={handleClose}
         >
             {/* Modal */}
             <div
-                className="bg-white rounded-xl shadow-xl w-full max-w-md mx-4 overflow-hidden"
+                className="bg-card rounded-xl shadow-xl w-full max-w-md mx-4 overflow-hidden"
                 onClick={(e) => e.stopPropagation()}
             >
                 {/* Header */}
                 <div className="flex items-center justify-between p-4">
-                    <h2 className="text-xl font-semibold text-gray-800">Add New Content</h2>
+                    <h2 className="text-xl font-semibold text-fg">Add New Content</h2>
                     <button
                         onClick={handleClose}
-                        className="p-1 hover:bg-gray-100 rounded-lg transition cursor-pointer"
+                        className="p-1 hover:bg-surface-hover rounded-lg transition cursor-pointer"
                     >
                         <CrossIcon />
                     </button>
@@ -66,14 +66,14 @@ export const CreateModal = ({ isOpen, onClose, onSubmit }: CreateModalProps) => 
                 <div className="p-4 space-y-4">
 
                     {error && (
-                        <div className="bg-red-50 text-red-600 px-4 py-2 rounded-lg text-sm">
+                        <div className="bg-danger-soft text-danger px-4 py-2 rounded-lg text-sm">
                             {error}
                         </div>
                     )}
 
                     {/* Title Input */}
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label className="block text-sm font-medium text-fg-muted mb-1">
                             Title
                         </label>
                         <input
@@ -81,13 +81,13 @@ export const CreateModal = ({ isOpen, onClose, onSubmit }: CreateModalProps) => 
                             value={title}
                             onChange={(e) => setTitle(e.target.value)}
                             placeholder="Enter title..."
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition"
+                            className="w-full px-4 py-2 border border-line rounded-lg focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition"
                         />
                     </div>
 
                     {/* Link Input */}
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label className="block text-sm font-medium text-fg-muted mb-1">
                             Link
                         </label>
                         <input
@@ -95,13 +95,13 @@ export const CreateModal = ({ isOpen, onClose, onSubmit }: CreateModalProps) => 
                             value={link}
                             onChange={(e) => setLink(e.target.value)}
                             placeholder="https://example.com"
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition"
+                            className="w-full px-4 py-2 border border-line rounded-lg focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition"
                         />
                     </div>
 
                     {/* Content Type Selection */}
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <label className="block text-sm font-medium text-fg-muted mb-2">
                             Content Type
                         </label>
                         <div className="flex gap-2">
@@ -112,7 +112,7 @@ export const CreateModal = ({ isOpen, onClose, onSubmit }: CreateModalProps) => 
                     </div>
                 </div>
 
-                <div className="flex items-center justify-end gap-3 p-4 bg-gray-50">
+                <div className="flex items-center justify-end gap-3 p-4 bg-surface">
                     <Button
                         varient="primary"
                         size="md"
@@ -130,8 +130,8 @@ const TypeButton = ({ label, active }: { label: string; active: boolean }) => (
   <span
     className={`px-3 py-1 rounded-full text-sm ${
       active
-        ? "bg-purple-100 text-purple-700"
-        : "bg-gray-100 text-gray-600"
+        ? "bg-accent-soft text-accent-soft-fg"
+        : "bg-surface-hover text-fg-muted"
     }`}
   >
     {label}

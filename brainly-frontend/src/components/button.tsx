@@ -11,8 +11,8 @@ interface ButtonProps {
 
 export const Button = (props: ButtonProps) => {
   const varientStyle = {
-    primary: "bg-purple-600 text-white hover:bg-purple-700",
-    secondary: "bg-purple-100 text-purple-700 hover:bg-purple-200",
+    primary: "bg-accent text-accent-fg hover:bg-accent-hover",
+    secondary: "bg-accent-soft text-accent-soft-fg hover:bg-surface-hover",
   };
 
   const sizeStyles = {
