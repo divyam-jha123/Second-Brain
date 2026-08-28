@@ -23,12 +23,6 @@ const itemClass = (isActive: boolean) =>
       : "text-fg-muted hover:bg-surface-hover hover:text-fg"
   }`;
 
-const GroupLabel = ({ children }: { children: string }) => (
-  <p className="px-2 pb-1 pt-4 text-[11px] font-medium tracking-wider text-fg-subtle">
-    {children}
-  </p>
-);
-
 /**
  * The nav renders here, once. Section changes swap only the content pane, and
  * every link is a router <Link> — a plain anchor would reload the document and
