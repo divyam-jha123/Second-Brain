@@ -1,5 +1,6 @@
 import { Link, NavLink, Outlet } from "react-router-dom";
 import { LuArrowLeft } from "react-icons/lu";
+import { SettingsErrorBoundary } from "./SettingsErrorBoundary";
 
 const ACCOUNT = [
   { to: "/settings/profile", label: "Profile" },
@@ -82,7 +83,9 @@ export function SettingsLayout() {
 
       <main className="flex-1 px-8 py-6 md:px-12">
         <div className="max-w-[560px]">
-          <Outlet />
+          <SettingsErrorBoundary>
+            <Outlet />
+          </SettingsErrorBoundary>
         </div>
       </main>
     </div>

@@ -193,6 +193,38 @@ export type EmailPrefsPatch = Partial<
   > & { digestSections: Partial<EmailPrefs["digestSections"]>; email: string }
 >;
 
+const EMAIL_PREF_DEFAULTS: EmailPrefs = {
+  featureAnnouncements: true,
+  weeklyDigest: true,
+  unsubscribedAll: false,
+  digestSections: {
+    savedThisWeek: true,
+    untaggedNudge: true,
+    recallQuestions: false,
+  },
+  digestDay: 0,
+  digestHour: 9,
+  timezone: "UTC",
+  consentedAt: null,
+  unsubscribedAt: null,
+  lastDigestSentAt: null,
+  email: null,
+};
+
+/**
+ * Fill in anything the API left out. An older deployment answers with only the
+ * three original flags, and reading `digestSections` off that response used to
+ * throw and blank the page.
+ */
+const normalizePrefs = (raw: Partial<EmailPrefs> | undefined): EmailPrefs => ({
+  ...EMAIL_PREF_DEFAULTS,
+  ...raw,
+  digestSections: {
+    ...EMAIL_PREF_DEFAULTS.digestSections,
+    ...raw?.digestSections,
+  },
+});
+
 export const fetchEmailPrefs = async (
   token: string | null,
   timezone: string,
@@ -201,7 +233,7 @@ export const fetchEmailPrefs = async (
     `${API_URL}/email/preferences?timezone=${encodeURIComponent(timezone)}`,
     authConfig(token),
   );
-  return res.data.preferences;
+  return normalizePrefs(res.data?.preferences);
 };
 
 export const patchEmailPrefs = async (
@@ -213,7 +245,7 @@ export const patchEmailPrefs = async (
     patch,
     authConfig(token),
   );
-  return res.data.preferences;
+  return normalizePrefs(res.data?.preferences);
 };
 
 /** Not built yet — the route answers 501 until the digest job exists. */

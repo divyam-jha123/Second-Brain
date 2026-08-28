@@ -9,7 +9,7 @@ import {
   FaLink,
   FaVideo,
 } from "react-icons/fa6";
-import { BrainIcon } from "../icons/brainIcon";
+import { BrainExpoLogo } from "../assets/brand/BrainExpoLogo";
 import { useLandingVariants, type LandingVariants } from "./landingAnimations";
 
 /**
@@ -260,7 +260,7 @@ export const BrainExpoLanding = () => {
           >
             <div className="flex items-center gap-2.5">
               <span style={{ color: ACCENT }}>
-                <BrainIcon size="lg" />
+                <BrainExpoLogo size="lg" />
               </span>
               <span className="text-xl font-bold tracking-tight text-white">Brain Expo</span>
             </div>
@@ -540,7 +540,7 @@ export const BrainExpoLanding = () => {
                   className="w-11 h-11 rounded-xl flex items-center justify-center mb-5"
                   style={{ backgroundColor: "rgba(119,76,255,0.1)", color: ACCENT }}
                 >
-                  <BrainIcon size="md" />
+                  <BrainExpoLogo size="md" />
                 </div>
                 <h3 className="text-lg font-semibold">{card.title}</h3>
                 <p className="mt-2 text-sm text-gray-500 leading-relaxed">{card.text}</p>
@@ -676,7 +676,7 @@ export const BrainExpoLanding = () => {
             <div className="col-span-2 md:col-span-1">
               <div className="flex items-center gap-2.5 text-white">
                 <span style={{ color: ACCENT }}>
-                  <BrainIcon size="lg" />
+                  <BrainExpoLogo size="lg" />
                 </span>
                 <span className="text-lg font-bold">Brain Expo</span>
               </div>
@@ -947,7 +947,7 @@ function HeroHub({ v, word }: { v: LandingVariants; word: string }) {
             }}
           >
             <span className="text-white">
-              <BrainIcon size="lg" />
+              <BrainExpoLogo size="lg" />
             </span>
           </div>
         </motion.div>

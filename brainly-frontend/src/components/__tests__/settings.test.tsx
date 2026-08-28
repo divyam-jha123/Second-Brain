@@ -173,6 +173,37 @@ describe("weekly email", () => {
     expect(screen.getByLabelText("Send weekly email")).toBeChecked();
   });
 
+  it("survives an older backend that omits the newer fields", async () => {
+    // What a deployment from before digest sections existed answers with.
+    vi.mocked(axios.get).mockResolvedValue({
+      data: {
+        preferences: {
+          featureAnnouncements: true,
+          weeklyDigest: true,
+          unsubscribedAll: false,
+        },
+      },
+    });
+
+    renderSettings("/settings/email");
+
+    // Previously this threw on `prefs.digestSections[key]` and blanked the page.
+    expect(await screen.findByLabelText("Send weekly email")).toBeInTheDocument();
+    expect(screen.getByLabelText("Recall questions")).not.toBeChecked();
+    expect(screen.getByLabelText("Delivery day")).toHaveValue("0");
+  });
+
+  it("shows an inline error when the request is blocked", async () => {
+    // A CORS block or a signed-out 302 both land here as a rejected request.
+    vi.mocked(axios.get).mockRejectedValue(new Error("Network Error"));
+
+    renderSettings("/settings/email");
+
+    expect(
+      await screen.findByText(/couldn't load your email settings/i),
+    ).toBeInTheDocument();
+  });
+
   it("surfaces the not-yet-built preview send", async () => {
     vi.mocked(axios.post).mockRejectedValueOnce(new Error("501"));
 

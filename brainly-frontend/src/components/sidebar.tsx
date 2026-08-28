@@ -7,9 +7,9 @@ import {
   LuLayers,
   LuPlus,
   LuSettings,
-  LuSparkles,
   LuTrash2,
 } from "react-icons/lu";
+import { BrainExpoLogo } from "../assets/brand/BrainExpoLogo";
 import type { Collection, Tag } from "../lib/api";
 
 export type ContentFilter =
@@ -137,8 +137,8 @@ export const Sidebar = ({
         className="flex items-center gap-2.5 px-5 py-5 text-left cursor-pointer"
         onClick={() => handleClick("all")}
       >
-        <span className="text-accent">
-          <LuSparkles size={18} />
+        <span className="text-brand">
+          <BrainExpoLogo size="md" />
         </span>
         <h1 className="text-lg font-bold tracking-tight text-fg">Brain Expo</h1>
       </button>

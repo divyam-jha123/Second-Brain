@@ -11,8 +11,8 @@ import {
   LuSearch,
   LuSettings,
   LuShare2,
-  LuSparkles,
 } from "react-icons/lu";
+import { BrainExpoLogo } from "../assets/brand/BrainExpoLogo";
 import { Sidebar } from "./sidebar";
 import type { ContentFilter } from "./sidebar";
 import { Card } from "./card";
@@ -369,8 +369,8 @@ export const Dashboard = () => {
         {/* Mobile Header (Hidden on Desktop) */}
         <div className="mb-5 flex items-center justify-between border-b border-line pb-4 md:hidden">
           <div className="flex items-center gap-2">
-            <span className="text-accent">
-              <LuSparkles size={18} />
+            <span className="text-brand">
+              <BrainExpoLogo size="md" />
             </span>
             <h1 className="text-lg font-bold tracking-tight text-fg">Brain Expo</h1>
           </div>

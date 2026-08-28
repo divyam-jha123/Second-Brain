@@ -21,6 +21,8 @@
   --fg-muted: #57534e;
   --fg-subtle: #a8a29e;
 
+  --brand: #774CFF;
+
   --accent: #2f6fed;
   --accent-hover: #2560d8;
   --accent-fg: #ffffff;
@@ -49,6 +51,8 @@
   --fg-muted: #a1a1aa;
   --fg-subtle: #6b6b73;
 
+  --brand: #8f6cff;
+
   --accent: #3b7bf5;
   --accent-hover: #5a91f7;
   --accent-fg: #ffffff;
@@ -76,6 +80,8 @@
   --color-fg: var(--fg);
   --color-fg-muted: var(--fg-muted);
   --color-fg-subtle: var(--fg-subtle);
+
+  --color-brand: var(--brand);
 
   --color-accent: var(--accent);
   --color-accent-hover: var(--accent-hover);
