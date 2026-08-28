@@ -1,4 +1,4 @@
-<h1 style="display: flex; justify-content: center; align-items: center;">
+<h1 align="center">
   <img src="brainly-frontend/src/assets/brand/brain-expo-logo.svg" alt="" width="40" height="40" />
   &nbsp;Brain Expo
 </h1>
