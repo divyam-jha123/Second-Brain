@@ -150,6 +150,7 @@ npm run dev          # Vite dev server on :5173
 VITE_BACKEND_URL=http://localhost:8000
 VITE_CLERK_PUBLISHABLE_KEY=
 VITE_EXTENSION_ID=
+VITE_SUPPORT_EMAIL=    # optional; defaults to contact@brainexpo.me
 ```
 
 ### Extension

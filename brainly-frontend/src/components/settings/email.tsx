@@ -9,7 +9,7 @@ import type { EmailPrefs, EmailPrefsPatch } from "../../lib/api";
 import {
   SettingsHeader,
   SettingsRow,
-} from "../../components/settings/primitives";
+} from "./primitives";
 
 const DAYS = [
   "Sunday",

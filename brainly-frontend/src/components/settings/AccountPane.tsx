@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useAuth, useClerk, useUser } from "@clerk/react";
 import { LuCheck, LuCopy, LuShieldCheck } from "react-icons/lu";
 import {
@@ -61,6 +61,7 @@ export const AccountPane = () => {
   const [weeklyEmail, setWeeklyEmail] = useState<boolean | null>(null);
   const [publicHash, setPublicHash] = useState<string | null>(null);
   const [publicLoaded, setPublicLoaded] = useState(false);
+  const hasLoaded = useRef(false);
   const [busy, setBusy] = useState(false);
   const [copied, setCopied] = useState(false);
   const [confirmingDelete, setConfirmingDelete] = useState(false);
@@ -72,21 +73,42 @@ export const AccountPane = () => {
     ? `${window.location.host}/share/${publicHash}`
     : null;
 
+  // Once per mount, and never again: `getToken` is a fresh function on every
+  // render, so an unguarded effect re-runs after each setState and overwrites
+  // a toggle the reader just flipped with the value the server had before it.
   useEffect(() => {
+    if (hasLoaded.current) return;
+    hasLoaded.current = true;
+
     (async () => {
-      try {
-        const token = await getToken();
-        const [prefs, links] = await Promise.all([
-          fetchEmailPrefs(token, browserTimezone()),
-          fetchShareLinks(token),
-        ]);
-        setWeeklyEmail(prefs.weeklyDigest && !prefs.unsubscribedAll);
-        setPublicHash(links.find((link) => link.scope === "all")?.hash ?? null);
-      } catch (err) {
-        console.error("Failed to load account settings:", err);
-        setError("Couldn't load your settings.");
-      } finally {
+      const token = await getToken();
+
+      // Settled separately: a failure to read share links must not leave the
+      // weekly-email switch stuck in its disabled loading state, or vice versa.
+      const [prefs, links] = await Promise.allSettled([
+        fetchEmailPrefs(token, browserTimezone()),
+        fetchShareLinks(token),
+      ]);
+
+      if (prefs.status === "fulfilled") {
+        setWeeklyEmail(
+          prefs.value.weeklyDigest && !prefs.value.unsubscribedAll,
+        );
+      } else {
+        console.error("Failed to load email preferences:", prefs.reason);
+      }
+
+      if (links.status === "fulfilled") {
+        setPublicHash(
+          links.value.find((link) => link.scope === "all")?.hash ?? null,
+        );
         setPublicLoaded(true);
+      } else {
+        console.error("Failed to load share links:", links.reason);
+      }
+
+      if (prefs.status === "rejected" || links.status === "rejected") {
+        setError("Couldn't load some of your settings.");
       }
     })();
   }, [getToken]);

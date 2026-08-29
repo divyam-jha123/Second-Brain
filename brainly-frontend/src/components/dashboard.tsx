@@ -1,6 +1,5 @@
 import axios from "axios";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { useAuth, useUser } from "@clerk/react";
 import {
   LuArrowUpDown,
@@ -24,6 +23,7 @@ import { useEmailSync } from "../hooks/useEmailSync";
 import { useOnboardingStatus } from "../hooks/useOnboardingStatus";
 import { getContentType } from "../lib/notes";
 import { readDefaultView } from "../lib/prefs";
+import { useSettingsDialog } from "./settings/useSettingsDialog";
 import type { ViewMode } from "../lib/prefs";
 import {
   createCollection,
@@ -95,9 +95,9 @@ export const Dashboard = () => {
   const [sortOrder, setSortOrder] = useState<SortOrder>("recent");
   const [viewMode, setViewMode] = useState<ViewMode>(readDefaultView);
   const searchRef = useRef<HTMLInputElement>(null);
-  const navigate = useNavigate();
   const { getToken } = useAuth();
   const { user } = useUser();
+  const { open: openSettings } = useSettingsDialog();
 
   // Ensure email preferences exist for this user
   useEmailSync();
@@ -378,7 +378,7 @@ export const Dashboard = () => {
           </div>
           <button
             type="button"
-            onClick={() => navigate("/settings/profile")}
+            onClick={() => openSettings("account")}
             title="Settings"
             aria-label="Settings"
             className="rounded-lg p-2 text-fg-muted transition-colors hover:bg-surface-hover hover:text-fg cursor-pointer"

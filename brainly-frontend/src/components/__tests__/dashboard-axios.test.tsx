@@ -5,6 +5,7 @@ import { Dashboard } from "../dashboard";
 import { API_URL } from "../../config";
 import { MemoryRouter } from "react-router-dom";
 import { ThemeProvider } from "../../theme/ThemeProvider";
+import { SettingsDialogProvider } from "../settings/SettingsDialogProvider";
 
 vi.mock("axios");
 
@@ -28,7 +29,9 @@ describe("Dashboard axios connectivity", () => {
     render(
     <ThemeProvider>
       <MemoryRouter>
-        <Dashboard />
+        <SettingsDialogProvider>
+          <Dashboard />
+        </SettingsDialogProvider>
       </MemoryRouter>
     </ThemeProvider>
     );

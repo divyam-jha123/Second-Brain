@@ -1,14 +1,12 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, waitFor } from "@testing-library/react";
+import type { ReactNode } from "react";
 import userEvent from "@testing-library/user-event";
 import axios from "axios";
-import { MemoryRouter, Route, Routes } from "react-router-dom";
-import { useClerk } from "@clerk/react";
-import { SettingsLayout } from "../../pages/settings/SettingsLayout";
-import { EmailSettings } from "../../pages/settings/Email";
-import { TagSettings } from "../settings/tags";
+import { MemoryRouter } from "react-router-dom";
+import { EmailSettings } from "../settings/email";
 import { SharingSettings } from "../settings/sharing";
-import { CaptureSettings, DangerSettings } from "../../pages/settings/Stubs";
+import { DataSettings } from "../settings/stubs";
 import { ThemeProvider } from "../../theme/ThemeProvider";
 import { API_URL } from "../../config";
 
@@ -47,70 +45,13 @@ const PREFS = {
   email: "alice@example.com",
 };
 
-const renderSettings = (initial = "/settings/tags") =>
+/** Sections render on their own now — the dialog around them is not the unit. */
+const renderPane = (pane: ReactNode) =>
   render(
     <ThemeProvider>
-      <MemoryRouter initialEntries={[initial]}>
-        <Routes>
-          <Route path="/settings" element={<SettingsLayout />}>
-            <Route path="tags" element={<TagSettings />} />
-            <Route path="sharing" element={<SharingSettings />} />
-            <Route path="email" element={<EmailSettings />} />
-            <Route path="capture" element={<CaptureSettings />} />
-            <Route path="danger" element={<DangerSettings />} />
-          </Route>
-        </Routes>
-      </MemoryRouter>
+      <MemoryRouter>{pane}</MemoryRouter>
     </ThemeProvider>,
   );
-
-describe("settings navigation", () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-    vi.mocked(axios.get).mockResolvedValue({ data: {} });
-  });
-
-  it("navigates client-side — every nav item is a router link", () => {
-    renderSettings();
-
-    // A plain <a href> would reload the document and remount the nav.
-    for (const name of ["Back to brain", "Profile", "Security", "Danger zone"]) {
-      expect(screen.getByRole("link", { name })).toHaveAttribute("href");
-    }
-  });
-
-  it("swaps only the content pane, keeping the nav mounted", async () => {
-    renderSettings();
-    const nav = screen.getByRole("link", { name: "Profile" });
-
-    await userEvent.click(screen.getByRole("link", { name: "Sharing" }));
-
-    await waitFor(() =>
-      expect(screen.getByRole("heading", { name: "Sharing" })).toBeInTheDocument(),
-    );
-    // Same DOM node: the layout was not torn down and rebuilt.
-    expect(screen.getByRole("link", { name: "Profile" })).toBe(nav);
-  });
-
-  it("signs out from the foot of the nav", async () => {
-    renderSettings();
-    const { signOut } = useClerk();
-
-    await userEvent.click(screen.getByRole("button", { name: /sign out/i }));
-
-    // Back to the landing page, not a protected route that would bounce.
-    expect(signOut).toHaveBeenCalledWith({ redirectUrl: "/" });
-  });
-
-  it("marks the active item from the pathname", () => {
-    renderSettings("/settings/sharing");
-
-    expect(screen.getByRole("link", { name: "Sharing" })).toHaveAttribute(
-      "aria-current",
-      "page",
-    );
-  });
-});
 
 describe("weekly email", () => {
   beforeEach(() => {
@@ -119,7 +60,7 @@ describe("weekly email", () => {
   });
 
   it("sends the browser timezone rather than asking for it", async () => {
-    renderSettings("/settings/email");
+    renderPane(<EmailSettings />);
 
     await waitFor(() =>
       expect(axios.get).toHaveBeenCalledWith(
@@ -134,7 +75,7 @@ describe("weekly email", () => {
       data: { preferences: { ...PREFS, weeklyDigest: false } },
     });
 
-    renderSettings("/settings/email");
+    renderPane(<EmailSettings />);
     await screen.findByLabelText("Send weekly email");
 
     await userEvent.click(screen.getByLabelText("Send weekly email"));
@@ -152,7 +93,7 @@ describe("weekly email", () => {
   it("reverts the control when the save fails", async () => {
     vi.mocked(axios.put).mockRejectedValueOnce(new Error("network"));
 
-    renderSettings("/settings/email");
+    renderPane(<EmailSettings />);
     const toggle = await screen.findByLabelText("Send weekly email");
     expect(toggle).toBeChecked();
 
@@ -167,7 +108,7 @@ describe("weekly email", () => {
       data: { preferences: { ...PREFS, weeklyDigest: false } },
     });
 
-    renderSettings("/settings/email");
+    renderPane(<EmailSettings />);
 
     expect(await screen.findByLabelText("Recall questions")).toBeDisabled();
     expect(screen.getByLabelText("Delivery day")).toBeDisabled();
@@ -183,7 +124,7 @@ describe("weekly email", () => {
       },
     });
 
-    renderSettings("/settings/email");
+    renderPane(<EmailSettings />);
     await userEvent.click(await screen.findByLabelText("What you saved this week"));
 
     await waitFor(() => expect(axios.put).toHaveBeenCalled());
@@ -204,7 +145,7 @@ describe("weekly email", () => {
       },
     });
 
-    renderSettings("/settings/email");
+    renderPane(<EmailSettings />);
 
     // Previously this threw on `prefs.digestSections[key]` and blanked the page.
     expect(await screen.findByLabelText("Send weekly email")).toBeInTheDocument();
@@ -216,7 +157,7 @@ describe("weekly email", () => {
     // A CORS block or a signed-out 302 both land here as a rejected request.
     vi.mocked(axios.get).mockRejectedValue(new Error("Network Error"));
 
-    renderSettings("/settings/email");
+    renderPane(<EmailSettings />);
 
     expect(
       await screen.findByText(/couldn't load your email settings/i),
@@ -226,7 +167,7 @@ describe("weekly email", () => {
   it("surfaces the not-yet-built preview send", async () => {
     vi.mocked(axios.post).mockRejectedValueOnce(new Error("501"));
 
-    renderSettings("/settings/email");
+    renderPane(<EmailSettings />);
     await userEvent.click(
       await screen.findByRole("button", { name: /send me one now/i }),
     );
@@ -275,28 +216,31 @@ describe("coming-soon sections", () => {
   });
 
   it("says what the section will do, not just \"coming soon\"", () => {
-    renderSettings("/settings/capture");
+    renderPane(<DataSettings />);
 
     expect(screen.getByText("Not built yet")).toBeInTheDocument();
     expect(
-      screen.getByText(/suggest tags based on what you've tagged before/i),
+      screen.getByText(/import from pocket, raindrop and browser bookmarks/i),
     ).toBeInTheDocument();
   });
 
-  it("points the notify link at the announcements toggle", () => {
-    renderSettings("/settings/capture");
+  it("hands the notify affordance to the announcements section", async () => {
+    const onNotify = vi.fn();
+    renderPane(<DataSettings onNotify={onNotify} />);
 
-    expect(
-      screen.getByRole("link", { name: /notify me when it ships/i }),
-    ).toHaveAttribute("href", "/settings/email");
+    await userEvent.click(
+      screen.getByRole("button", { name: /notify me when it ships/i }),
+    );
+
+    expect(onNotify).toHaveBeenCalled();
   });
 
-  it("offers no notify link for account deletion", () => {
-    renderSettings("/settings/danger");
+  it("offers no notify affordance when there is nowhere to send you", () => {
+    renderPane(<DataSettings />);
 
     expect(screen.getByText("Not built yet")).toBeInTheDocument();
     expect(
-      screen.queryByRole("link", { name: /notify me/i }),
+      screen.queryByRole("button", { name: /notify me/i }),
     ).not.toBeInTheDocument();
   });
 });

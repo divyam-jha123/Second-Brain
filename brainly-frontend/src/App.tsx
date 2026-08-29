@@ -3,20 +3,7 @@ import { SignIn, SignUp, useAuth } from '@clerk/react';
 import { Dashboard } from './components/dashboard';
 import { SharedDashboard } from './components/sharedDashboard';
 import { BrainExpoLanding } from './components/BrainExpoLanding';
-import { SettingsLayout } from './pages/settings/SettingsLayout';
-import { ProfileSettings } from './pages/settings/Profile';
-import { SecuritySettings } from './pages/settings/Security';
-import { EmailSettings } from './pages/settings/Email';
-import {
-  CaptureSettings,
-  DangerSettings,
-  DataSettings,
-  PlanSettings,
-} from './pages/settings/Stubs';
-import { AppearanceSettings } from './components/settings/appearance';
-import { ExtensionSettings } from './components/settings/extension';
-import { SharingSettings } from './components/settings/sharing';
-import { TagSettings } from './components/settings/tags';
+import { SettingsDialogProvider } from './components/settings/SettingsDialogProvider';
 import { Unsubscribe } from './pages/Unsubscribe';
 import { AdminEmail } from './pages/Admin';
 import { Loader } from './icons/loader';
@@ -24,7 +11,8 @@ import { Loader } from './icons/loader';
 export default function App() {
   return (
     <BrowserRouter>
-      <Routes>
+      <SettingsDialogProvider>
+        <Routes>
         <Route
           path="/"
           element={<HomePage />}
@@ -34,20 +22,6 @@ export default function App() {
           path="/dashboard"
           element={<ProtectedDashboard />}
         />
-        <Route path="/settings" element={<ProtectedSettings />}>
-          <Route index element={<Navigate to="/settings/profile" replace />} />
-          <Route path="profile" element={<ProfileSettings />} />
-          <Route path="security" element={<SecuritySettings />} />
-          <Route path="email" element={<EmailSettings />} />
-          <Route path="capture" element={<CaptureSettings />} />
-          <Route path="sharing" element={<SharingSettings />} />
-          <Route path="tags" element={<TagSettings />} />
-          <Route path="appearance" element={<AppearanceSettings />} />
-          <Route path="extension" element={<ExtensionSettings />} />
-          <Route path="data" element={<DataSettings />} />
-          <Route path="plan" element={<PlanSettings />} />
-          <Route path="danger" element={<DangerSettings />} />
-        </Route>
         <Route
           path="/admin/email"
           element={<ProtectedAdmin />}
@@ -75,7 +49,8 @@ export default function App() {
         <Route path="/unsubscribe" element={<Unsubscribe />} />
 
         <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
+        </Routes>
+      </SettingsDialogProvider>
     </BrowserRouter>
   )
 }
@@ -116,27 +91,6 @@ function ProtectedDashboard() {
   }
 
   return <Dashboard />;
-}
-
-function ProtectedSettings() {
-  const { isSignedIn, isLoaded } = useAuth();
-
-  if (!isLoaded) {
-    return (
-      <div className="flex items-center justify-center min-h-screen bg-bg">
-        <div className="flex flex-col items-center gap-3">
-          <div className="w-8 h-8 border-4 border-line border-t-accent rounded-full animate-spin" />
-          <p className="text-sm text-fg-muted">Loading...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (!isSignedIn) {
-    return <Navigate to="/sign-in" replace />;
-  }
-
-  return <SettingsLayout />;
 }
 
 function ProtectedAdmin() {

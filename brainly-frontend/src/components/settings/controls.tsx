@@ -143,8 +143,8 @@ export const Switch = ({
     } ${disabled ? "cursor-not-allowed opacity-50" : "cursor-pointer"}`}
   >
     <span
-      className={`absolute top-[3px] h-[18px] w-[18px] rounded-full bg-white shadow-sm transition-transform ${
-        checked ? "translate-x-[23px]" : "translate-x-[3px]"
+      className={`absolute left-[3px] top-[3px] h-[18px] w-[18px] rounded-full bg-white shadow-sm transition-transform ${
+        checked ? "translate-x-[20px]" : "translate-x-0"
       }`}
     />
   </button>

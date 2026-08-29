@@ -8,6 +8,7 @@ import {
   LuPalette,
   LuPuzzle,
   LuShare,
+  LuTag,
   LuUser,
   LuX,
 } from "react-icons/lu";
@@ -15,18 +16,11 @@ import { AccountPane } from "./AccountPane";
 import { AppearanceSettings } from "./appearance";
 import { ExtensionSettings } from "./extension";
 import { SharingSettings } from "./sharing";
-import { EmailSettings } from "../../pages/settings/Email";
-import { DataSettings, PlanSettings } from "../../pages/settings/Stubs";
-import { SettingsErrorBoundary } from "../../pages/settings/SettingsErrorBoundary";
-
-export type SettingsSection =
-  | "account"
-  | "appearance"
-  | "notifications"
-  | "shared"
-  | "extension"
-  | "data"
-  | "plan";
+import { TagSettings } from "./tags";
+import { EmailSettings } from "./email";
+import { DataSettings, PlanSettings } from "./stubs";
+import { SettingsErrorBoundary } from "./SettingsErrorBoundary";
+import type { SettingsSection } from "./settingsDialogContext";
 
 const SECTIONS: {
   id: SettingsSection;
@@ -37,19 +31,22 @@ const SECTIONS: {
   { id: "appearance", label: "Appearance", icon: <LuPalette size={16} /> },
   { id: "notifications", label: "Notifications", icon: <LuBell size={16} /> },
   { id: "shared", label: "Shared brain", icon: <LuShare size={16} /> },
+  { id: "tags", label: "Tags", icon: <LuTag size={16} /> },
   { id: "extension", label: "Extension", icon: <LuPuzzle size={16} /> },
   { id: "data", label: "Data", icon: <LuDatabase size={16} /> },
   { id: "plan", label: "Plan", icon: <LuCreditCard size={16} /> },
 ];
 
-const PANES: Record<SettingsSection, () => ReactNode> = {
+/** `notify` sends a not-built-yet section to the announcements toggle. */
+const PANES: Record<SettingsSection, (notify: () => void) => ReactNode> = {
   account: () => <AccountPane />,
   appearance: () => <AppearanceSettings />,
   notifications: () => <EmailSettings />,
   shared: () => <SharingSettings />,
+  tags: () => <TagSettings />,
   extension: () => <ExtensionSettings />,
-  data: () => <DataSettings />,
-  plan: () => <PlanSettings />,
+  data: (notify) => <DataSettings onNotify={notify} />,
+  plan: (notify) => <PlanSettings onNotify={notify} />,
 };
 
 interface SettingsDialogProps {
@@ -138,7 +135,7 @@ export const SettingsDialog = ({
         <div className="min-w-0 flex-1 overflow-y-auto px-6 py-6 md:px-8">
           <div className="mx-auto max-w-[560px]">
             <SettingsErrorBoundary key={section}>
-              {PANES[section]()}
+              {PANES[section](() => onSectionChange("notifications"))}
             </SettingsErrorBoundary>
           </div>
         </div>

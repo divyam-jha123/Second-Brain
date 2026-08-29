@@ -108,7 +108,7 @@ export function Unsubscribe() {
             Go to Dashboard
           </a>
           <a
-            href="/settings"
+            href="/dashboard?settings=notifications"
             className="text-sm text-purple-600 hover:text-purple-800 transition-colors"
           >
             Manage email preferences

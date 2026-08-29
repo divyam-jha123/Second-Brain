@@ -14,9 +14,10 @@ import {
   LuShare,
   LuUser,
 } from "react-icons/lu";
+import { SUPPORT_EMAIL } from "../config";
 import { fetchEmailPrefs, fetchShareLinks, patchEmailPrefs } from "../lib/api";
-import { SettingsDialog } from "./settings/SettingsDialog";
-import type { SettingsSection } from "./settings/SettingsDialog";
+import { useSettingsDialog } from "./settings/useSettingsDialog";
+import type { SettingsSection } from "./settings/settingsDialogContext";
 import { useTheme } from "../theme/useTheme";
 import type { ThemePreference } from "../theme/themeContext";
 
@@ -151,7 +152,7 @@ interface AccountMenuProps {
   savedCount?: number;
   /** Where the store listing lives. Omitted: the row points at the in-app page. */
   extensionUrl?: string;
-  /** Where "Help and feedback" goes. */
+  /** Where "Help and feedback" goes. Defaults to the support inbox. */
   helpUrl?: string;
 }
 
@@ -165,18 +166,16 @@ interface AccountMenuProps {
 export const AccountMenu = ({
   savedCount,
   extensionUrl,
-  helpUrl = "mailto:support@brainexpo.me",
+  helpUrl = `mailto:${SUPPORT_EMAIL}`,
 }: AccountMenuProps) => {
   const navigate = useNavigate();
   const { getToken } = useAuth();
   const { user } = useUser();
   const { signOut } = useClerk();
   const { theme, setTheme } = useTheme();
+  const { open: openSettingsDialog } = useSettingsDialog();
 
   const [open, setOpen] = useState(false);
-  const [settingsSection, setSettingsSection] = useState<SettingsSection | null>(
-    null,
-  );
   const [weeklyEmail, setWeeklyEmail] = useState<boolean | null>(null);
   const [isPublic, setIsPublic] = useState<boolean | null>(null);
   const rootRef = useRef<HTMLDivElement>(null);
@@ -207,8 +206,15 @@ export const AccountMenu = ({
     };
   }, [open]);
 
+  // Re-read on each open so a change made in the settings dialog shows here,
+  // and never mid-open: `getToken` changes identity every render, so an
+  // unguarded fetch would clobber a toggle the reader just flipped.
   useEffect(() => {
-    if (!open || hasLoaded.current) return;
+    if (!open) {
+      hasLoaded.current = false;
+      return;
+    }
+    if (hasLoaded.current) return;
     hasLoaded.current = true;
 
     (async () => {
@@ -223,9 +229,9 @@ export const AccountMenu = ({
         setWeeklyEmail(prefs.weeklyDigest && !prefs.unsubscribedAll);
         setIsPublic(links.length > 0);
       } catch (error) {
-        // A failed read leaves both right slots blank rather than lying about state.
+        // A failed read leaves both right slots blank rather than lying about
+        // state. The retry comes on the next open, not on the next render.
         console.error("Failed to load account menu state:", error);
-        hasLoaded.current = false;
       }
     })();
   }, [open, getToken]);
@@ -245,7 +251,7 @@ export const AccountMenu = ({
 
   const openSettings = (section: SettingsSection) => {
     setOpen(false);
-    setSettingsSection(section);
+    openSettingsDialog(section);
   };
 
   const cycleTheme = () =>
@@ -396,13 +402,6 @@ export const AccountMenu = ({
           />
         </div>
       )}
-
-      <SettingsDialog
-        open={settingsSection !== null}
-        section={settingsSection ?? "account"}
-        onSectionChange={setSettingsSection}
-        onClose={() => setSettingsSection(null)}
-      />
     </div>
   );
 };

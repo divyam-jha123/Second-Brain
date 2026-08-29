@@ -1,5 +1,4 @@
 import type { ReactNode } from "react";
-import { Link } from "react-router-dom";
 import { LuArrowRight, LuBell, LuWrench } from "react-icons/lu";
 
 /** Top of every settings page. */
@@ -52,7 +51,7 @@ export const SettingsRow = ({
  * Placeholder body for sections whose internals are a separate task.
  *
  * "Coming soon." on its own tells someone nothing about whether to wait or go
- * elsewhere, so each section says what it will actually do. `notify` links to
+ * elsewhere, so each section says what it will actually do. `onNotify` goes to
  * the announcements toggle that already exists rather than inventing a
  * subscribe endpoint — a button that silently does nothing is worse than none.
  */
@@ -60,7 +59,7 @@ export const ComingSoon = ({
   summary,
   planned,
   eta,
-  notify = true,
+  onNotify,
 }: {
   /** One line on what this section will be for. */
   summary: string;
@@ -68,7 +67,8 @@ export const ComingSoon = ({
   planned: string[];
   /** Rough timing, when it's honest to give one. */
   eta?: string;
-  notify?: boolean;
+  /** Sends the reader to the announcements toggle. Omitted: no affordance. */
+  onNotify?: () => void;
 }) => (
   <div className="rounded-xl border border-dashed border-line-strong p-6">
     <div className="flex items-start gap-3">
@@ -92,15 +92,16 @@ export const ComingSoon = ({
           <p className="mt-4 text-xs text-fg-subtle">{eta}</p>
         )}
 
-        {notify && (
-          <Link
-            to="/settings/email"
-            className="mt-5 inline-flex items-center gap-2 rounded-lg border border-line px-3.5 py-2 text-sm font-medium text-fg transition-colors hover:bg-surface-hover"
+        {onNotify && (
+          <button
+            type="button"
+            onClick={onNotify}
+            className="mt-5 inline-flex items-center gap-2 rounded-lg border border-line px-3.5 py-2 text-sm font-medium text-fg transition-colors hover:bg-surface-hover cursor-pointer"
           >
             <LuBell size={14} />
             Notify me when it ships
             <LuArrowRight size={14} className="text-fg-subtle" />
-          </Link>
+          </button>
         )}
       </div>
     </div>

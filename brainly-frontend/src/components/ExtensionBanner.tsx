@@ -1,10 +1,10 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { useExtensionBridge } from "../hooks/useExtensionBridge";
+import { useSettingsDialog } from "./settings/useSettingsDialog";
 
 export function ExtensionBanner() {
   const { status } = useExtensionBridge();
-  const navigate = useNavigate();
+  const { open } = useSettingsDialog();
   const [dismissed, setDismissed] = useState(false);
 
   if (dismissed || status === "connected" || status === "checking") {
@@ -30,7 +30,7 @@ export function ExtensionBanner() {
       </div>
 
       <div className="extension-banner__actions">
-        <button className="btn-banner-primary" onClick={() => navigate("/settings")}>
+        <button className="btn-banner-primary" onClick={() => open("extension")}>
           Set up extension →
         </button>
         <button className="btn-banner-dismiss" onClick={dismiss} aria-label="Dismiss">
