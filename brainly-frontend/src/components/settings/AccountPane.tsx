@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useAuth, useClerk, useUser } from "@clerk/react";
-import { LuCheck, LuCopy, LuShieldCheck } from "react-icons/lu";
+import { LuCheck, LuCopy } from "react-icons/lu";
 import {
   createShareLink,
   fetchEmailPrefs,
