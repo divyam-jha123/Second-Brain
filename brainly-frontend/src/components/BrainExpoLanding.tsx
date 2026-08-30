@@ -12,6 +12,7 @@ import {
 import { BrainExpoLogo } from "../assets/brand/BrainExpoLogo";
 import { useLandingVariants, type LandingVariants } from "./landingAnimations";
 import { FeaturesScrollytelling } from "./landing/FeaturesScrollytelling";
+import { ProductStatement } from "./landing/ProductStatement";
 
 /**
  * Brain Expo landing page.
@@ -460,14 +461,7 @@ export const BrainExpoLanding = () => {
       </section>
 
       {/* ---------- Big statement ---------- */}
-      <section id="products" className="max-w-5xl mx-auto px-4 sm:px-6 py-24 text-center">
-        <h2 className="text-2xl sm:text-3xl md:text-4xl font-semibold leading-snug tracking-tight text-gray-400">
-          Instead of living as{" "}
-          <span className="text-gray-900">forgotten tabs</span>, Brain Expo turns
-          everything you save into{" "}
-          <span style={{ color: ACCENT }}>knowledge you actually use</span>.
-        </h2>
-      </section>
+      <ProductStatement />
 
       {/* ---------- Trusted by ---------- */}
       <section className="border-y border-gray-100 bg-gray-50/60">
