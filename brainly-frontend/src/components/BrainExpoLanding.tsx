@@ -9,10 +9,15 @@ import {
   FaLink,
   FaVideo,
 } from "react-icons/fa6";
+import { SUPPORT_EMAIL } from "../config";
 import { BrainExpoLogo } from "../assets/brand/BrainExpoLogo";
 import { useLandingVariants, type LandingVariants } from "./landingAnimations";
 import { FeaturesScrollytelling } from "./landing/FeaturesScrollytelling";
 import { ProductStatement } from "./landing/ProductStatement";
+import { FeatureSwitcher } from "./landing/FeatureSwitcher";
+import { ServiceCards } from "./landing/ServiceCards";
+import { SecurityBand } from "./landing/SecurityBand";
+import { ClosingCTA } from "./landing/ClosingCTA";
 
 /**
  * Brain Expo landing page.
@@ -135,29 +140,6 @@ const heroNodes: {
     path: "M 645 332 C 780 400, 950 470, 1116 504", origin: [645, 332], thread: 1.2, entrance: 1.5, floatDur: 7.3, floatDelay: 1.4 },
 ];
 
-const serviceCards = [
-  {
-    title: "Capture Anything",
-    text: "Links, tweets, YouTube videos, PDFs and notes — one shortcut saves it all to your second brain, from anywhere on the web.",
-  },
-  {
-    title: "Smart Tags & Search",
-    text: "Every item is auto-tagged and full-text indexed, so the thing you saved six months ago is one search away.",
-  },
-  {
-    title: "Browser Extension",
-    text: "Clip pages without breaking flow. The Brain Expo extension drops what you're reading straight into your library.",
-  },
-  {
-    title: "Share Collections",
-    text: "Publish a curated set as a public link. Perfect for research handoffs, reading lists and team knowledge.",
-  },
-  {
-    title: "Email Sync & Digest",
-    text: "Forward newsletters and notes to your inbox address and get a weekly digest of what you've been collecting.",
-  },
-];
-
 // The six source logos, matching the Framer template's Integration Logo row.
 const integrationLogos: { name: string; Icon: React.ComponentType<{ className?: string }> }[] = [
   { name: "YouTube", Icon: FaYoutube },
@@ -167,47 +149,6 @@ const integrationLogos: { name: string; Icon: React.ComponentType<{ className?: 
   { name: "Link", Icon: FaLink },
   { name: "Video", Icon: FaVideo },
 ];
-
-const testimonials = [
-  {
-    quote:
-      "I used to lose every good article in a sea of open tabs. Brain Expo made my reading actually compound.",
-    name: "Maya Okonkwo",
-    title: "Product Researcher",
-  },
-  {
-    quote:
-      "The tagging is scary good. I search a half-remembered phrase and the exact tweet from months ago shows up.",
-    name: "Daniel Reyes",
-    title: "Indie Founder",
-  },
-  {
-    quote:
-      "Sharing a collection instead of pasting ten links changed how our team hands off research.",
-    name: "Priya Nair",
-    title: "Design Lead",
-  },
-  {
-    quote:
-      "It's the first bookmarking tool I actually kept using past week one. The extension is that smooth.",
-    name: "Tom Fischer",
-    title: "Software Engineer",
-  },
-  {
-    quote:
-      "My newsletters, my clips, my notes — finally in one place I trust. This is the second brain I wanted.",
-    name: "Aisha Karim",
-    title: "Writer & Curator",
-  },
-  {
-    quote:
-      "The weekly digest quietly turned my saved-and-forgotten pile into things I actually revisit.",
-    name: "Leo Marchetti",
-    title: "PhD Candidate",
-  },
-];
-
-const partners = ["Northwind", "Lumen", "Cortex", "Overcast", "Fieldnote", "Beacon"];
 
 export const BrainExpoLanding = () => {
   const [isNavOpen, setIsNavOpen] = useState(false);
@@ -222,7 +163,7 @@ export const BrainExpoLanding = () => {
       // `overflow-x-clip` (not `-hidden`): clipping alone, without turning this
       // wrapper into a scroll container — which would break `position: sticky`
       // inside it (the scrollytelling tour depends on it).
-      className="min-h-screen bg-[#e9e9e9] text-[#1b1b22] overflow-x-clip antialiased"
+      className="landing-root min-h-screen bg-[#e9e9e9] text-[#1b1b22] overflow-x-clip antialiased"
       initial="hidden"
       animate="visible"
       variants={v.root}
@@ -275,8 +216,8 @@ export const BrainExpoLanding = () => {
                 ["Features", "#tour"],
                 ["Products", "#products"],
                 ["Integrations", "#integrations"],
-                ["Reviews", "#reviews"],
-              ].map(([label, href]) => (
+                ["Security", "#security"],
+                ].map(([label, href]) => (
                 <a
                   key={href}
                   href={href}
@@ -333,8 +274,8 @@ export const BrainExpoLanding = () => {
               ["Features", "#tour"],
               ["Products", "#products"],
               ["Integrations", "#integrations"],
-              ["Reviews", "#reviews"],
-            ].map(([label, href]) => (
+              ["Security", "#security"],
+              ].map(([label, href]) => (
               <a
                 key={href}
                 href={href}
@@ -463,93 +404,14 @@ export const BrainExpoLanding = () => {
       {/* ---------- Big statement ---------- */}
       <ProductStatement />
 
-      {/* ---------- Trusted by ---------- */}
-      <section className="border-y border-gray-100 bg-gray-50/60">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-12">
-          <p className="text-center text-xs font-semibold uppercase tracking-widest text-gray-400">
-            Trusted by curious minds everywhere
-          </p>
-          <div className="mt-8 flex flex-wrap items-center justify-center gap-x-10 gap-y-6">
-            {partners.map((name) => (
-              <span key={name} className="text-lg font-bold text-gray-300 select-none">
-                {name}
-              </span>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* ---------- Guided product tour (scrollytelling) ---------- */}
       <FeaturesScrollytelling />
 
-      {/* ---------- Feature highlight ---------- */}
-      <section id="features" className="max-w-6xl mx-auto px-4 sm:px-6 py-24">
-        <div className="text-center max-w-2xl mx-auto">
-          <h2 className="text-3xl sm:text-4xl font-bold tracking-tight">
-            From scattered tabs to a single source of truth
-          </h2>
-          <p className="mt-4 text-gray-500 leading-relaxed">
-            Your bookmarks aren't built to grow with you. Brain Expo turns the
-            things you save into a connected, searchable knowledge base — delivered
-            through a handful of tools that work the way you already do.
-          </p>
-        </div>
+      {/* ---------- What you can save (interactive type filter) ---------- */}
+      <FeatureSwitcher />
 
-        <div className="mt-14 rounded-3xl border border-gray-200 bg-gradient-to-br from-[#f7f5ff] to-white p-6 sm:p-10">
-          <div className="grid md:grid-cols-3 gap-6">
-            {[
-              ["Capture", "Save from any tab, app or share sheet in a single tap."],
-              ["Organize", "Auto-tags and full-text search keep everything findable."],
-              ["Recall", "Surface the right note, link or clip the moment it matters."],
-            ].map(([title, text], i) => (
-              <div key={title} className="rounded-2xl bg-white border border-gray-100 p-6 shadow-sm">
-                <div
-                  className="w-10 h-10 rounded-xl flex items-center justify-center text-white font-bold mb-4"
-                  style={{ backgroundColor: ACCENT }}
-                >
-                  {i + 1}
-                </div>
-                <h3 className="text-lg font-semibold">{title}</h3>
-                <p className="mt-2 text-sm text-gray-500 leading-relaxed">{text}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ---------- Service cards grid ---------- */}
-      <section className="bg-gray-50/60 border-y border-gray-100">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-24">
-          <div className="text-center max-w-2xl mx-auto mb-14">
-            <h2 className="text-3xl sm:text-4xl font-bold tracking-tight">
-              Everything your second brain needs
-            </h2>
-            <p className="mt-4 text-gray-500">
-              Five tools that turn saving into remembering.
-            </p>
-          </div>
-
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {serviceCards.map((card, i) => (
-              <div
-                key={card.title}
-                className={`rounded-2xl border border-gray-200 bg-white p-7 shadow-sm hover:shadow-md transition-shadow ${
-                  i === 0 ? "lg:col-span-2" : ""
-                }`}
-              >
-                <div
-                  className="w-11 h-11 rounded-xl flex items-center justify-center mb-5"
-                  style={{ backgroundColor: "rgba(119,76,255,0.1)", color: ACCENT }}
-                >
-                  <BrainExpoLogo size="md" />
-                </div>
-                <h3 className="text-lg font-semibold">{card.title}</h3>
-                <p className="mt-2 text-sm text-gray-500 leading-relaxed">{card.text}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+      {/* ---------- The five tools ---------- */}
+      <ServiceCards />
 
       {/* ---------- Integrations (push / pull) ---------- */}
       <section id="integrations" className="max-w-6xl mx-auto px-4 sm:px-6 py-24">
@@ -594,81 +456,11 @@ export const BrainExpoLanding = () => {
         </div>
       </section>
 
-      {/* ---------- Testimonials ---------- */}
-      <section id="reviews" className="bg-gray-50/60 border-y border-gray-100 overflow-hidden">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-24">
-          <div className="text-center max-w-2xl mx-auto mb-14">
-            <h2 className="text-3xl sm:text-4xl font-bold tracking-tight">
-              Loved by note-takers and researchers
-            </h2>
-            <p className="mt-4 text-gray-500">
-              Thousands of people trust Brain Expo to hold what matters.
-            </p>
-          </div>
-        </div>
+      {/* ---------- Security (revocable-link demo) ---------- */}
+      <SecurityBand />
 
-        <div className="marquee-pause pb-6">
-          <div className="marquee-track marquee-left gap-5 px-2">
-            {[...testimonials, ...testimonials].map((t, i) => (
-              <TestimonialCard key={`a-${i}`} {...t} />
-            ))}
-          </div>
-        </div>
-        <div className="marquee-pause pb-24">
-          <div className="marquee-track marquee-right marquee-slow gap-5 px-2">
-            {[...testimonials.slice().reverse(), ...testimonials.slice().reverse()].map((t, i) => (
-              <TestimonialCard key={`b-${i}`} {...t} />
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ---------- Compliance band ---------- */}
-      <section className="max-w-6xl mx-auto px-4 sm:px-6 py-20">
-        <div className="rounded-3xl border border-gray-200 bg-[#1b1b22] text-white p-8 sm:p-12 flex flex-col md:flex-row items-center gap-8">
-          <div className="flex-1">
-            <span
-              className="inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold"
-              style={{ backgroundColor: "rgba(119,76,255,0.2)", color: "#c9b8ff" }}
-            >
-              GDPR &amp; SOC-2 Ready
-            </span>
-            <h3 className="mt-4 text-2xl sm:text-3xl font-bold tracking-tight">
-              Compliance and security, built in
-            </h3>
-            <p className="mt-3 text-gray-300 max-w-xl leading-relaxed">
-              Enterprise-grade security with end-to-end encryption, strict access
-              controls and privacy practices your whole team can trust.
-            </p>
-          </div>
-          <div className="grid grid-cols-3 gap-4 w-full md:w-auto">
-            {["Encrypted", "Private", "Yours"].map((label) => (
-              <div key={label} className="rounded-xl bg-white/5 border border-white/10 px-4 py-5 text-center">
-                <p className="text-sm font-semibold">{label}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ---------- CTA ---------- */}
-      <section id="cta" className="max-w-4xl mx-auto px-4 sm:px-6 pb-24 text-center">
-        <h2 className="text-3xl sm:text-4xl font-bold tracking-tight">
-          Start building your second brain today
-        </h2>
-        <p className="mt-4 text-gray-500">
-          Free to start. No credit card required.
-        </p>
-        <div className="mt-8">
-          <Link
-            to="/sign-up"
-            className="text-sm font-semibold text-white px-8 py-3.5 rounded-xl shadow-sm hover:opacity-90 transition-opacity inline-flex items-center justify-center min-h-[48px]"
-            style={{ backgroundColor: ACCENT }}
-          >
-            Start for free
-          </Link>
-        </div>
-      </section>
+      {/* ---------- Closing CTA ---------- */}
+      <ClosingCTA />
 
       {/* ---------- Footer ---------- */}
       <footer className="bg-[#0f0e14] text-gray-400">
@@ -687,18 +479,47 @@ export const BrainExpoLanding = () => {
               </p>
             </div>
 
-            <FooterCol title="PRODUCT" links={["Features", "Integrations", "Extension", "Pricing"]} />
-            <FooterCol title="COMPANY" links={["About", "Blog", "Community", "Privacy"]} />
-            <FooterCol title="SOCIAL" links={["Twitter", "YouTube", "LinkedIn", "Discord"]} />
+            {/*
+              Only destinations that exist. Pricing, a blog, a community and the
+              social accounts were all links to nothing — a dead link costs more
+              trust than an absent one.
+            */}
+            <FooterCol
+              title="PRODUCT"
+              links={[
+                { label: "How it works", href: "#tour" },
+                { label: "Save anything", href: "#features" },
+                { label: "Integrations", href: "#integrations" },
+                { label: "Security", href: "#security" },
+              ]}
+            />
+            <FooterCol
+              title="GET STARTED"
+              links={[
+                { label: "Create an account", href: "/sign-up" },
+                { label: "Log in", href: "/sign-in" },
+              ]}
+            />
+            <FooterCol
+              title="SUPPORT"
+              links={[{ label: "Contact us", href: `mailto:${SUPPORT_EMAIL}` }]}
+            />
           </div>
 
-          <div className="border-t border-white/10 mt-12 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
-            <p className="text-xs">© 2026 Brain Expo Inc. All rights reserved.</p>
-            <div className="flex gap-6 text-xs">
-              <a href="#" className="hover:text-white transition-colors">Terms of Service</a>
-              <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
-              <a href="#" className="hover:text-white transition-colors">Cookie Settings</a>
-            </div>
+          {/*
+            Terms / Privacy / Cookie links pointed at "#". They are worth adding
+            for real — this product stores saves and sends email — but a link to
+            nothing is worse than no link. "Inc." also went: nothing establishes
+            that the company is incorporated.
+          */}
+          <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-white/10 pt-8 md:flex-row">
+            <p className="text-xs">© 2026 Brain Expo. All rights reserved.</p>
+            <a
+              href={`mailto:${SUPPORT_EMAIL}`}
+              className="inline-flex min-h-[36px] items-center text-xs decoration-white/40 underline-offset-4 transition-colors hover:text-white hover:underline focus-visible:rounded focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+            >
+              {SUPPORT_EMAIL}
+            </a>
           </div>
         </div>
       </footer>
@@ -1076,38 +897,37 @@ function IntegrationLogo({
   );
 }
 
-function TestimonialCard({ quote, name, title }: { quote: string; name: string; title: string }) {
-  return (
-    <figure className="w-80 shrink-0 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
-      <blockquote className="text-sm text-gray-700 leading-relaxed">"{quote}"</blockquote>
-      <figcaption className="mt-5 flex items-center gap-3">
-        <div
-          className="w-9 h-9 rounded-full flex items-center justify-center text-white text-sm font-semibold"
-          style={{ backgroundColor: ACCENT }}
-        >
-          {name[0]}
-        </div>
-        <div>
-          <p className="text-sm font-semibold text-gray-900">{name}</p>
-          <p className="text-xs text-gray-400">{title}</p>
-        </div>
-      </figcaption>
-    </figure>
-  );
-}
-
-function FooterCol({ title, links }: { title: string; links: string[] }) {
+function FooterCol({
+  title,
+  links,
+}: {
+  title: string;
+  links: { label: string; href: string }[];
+}) {
   return (
     <div>
-      <h4 className="text-white font-semibold text-sm mb-4">{title}</h4>
-      <ul className="space-y-2 text-sm">
-        {links.map((l) => (
-          <li key={l}>
-            <a href="#" className="hover:text-white transition-colors">
-              {l}
-            </a>
-          </li>
-        ))}
+      <h4 className="mb-4 text-sm font-semibold text-white">{title}</h4>
+      <ul className="space-y-1 text-sm">
+        {links.map(({ label, href }) => {
+          // In-page anchors and mailto: stay plain <a>; app routes go through
+          // the router so they don't cost a full reload.
+          const isRoute = href.startsWith("/");
+          const className =
+            "inline-flex min-h-[36px] items-center decoration-white/40 underline-offset-4 transition-colors hover:text-white hover:underline focus-visible:rounded focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white";
+          return (
+            <li key={label}>
+              {isRoute ? (
+                <Link to={href} className={className}>
+                  {label}
+                </Link>
+              ) : (
+                <a href={href} className={className}>
+                  {label}
+                </a>
+              )}
+            </li>
+          );
+        })}
       </ul>
     </div>
   );
