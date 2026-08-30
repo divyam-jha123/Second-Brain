@@ -11,6 +11,7 @@ import {
 } from "react-icons/fa6";
 import { BrainExpoLogo } from "../assets/brand/BrainExpoLogo";
 import { useLandingVariants, type LandingVariants } from "./landingAnimations";
+import { FeaturesScrollytelling } from "./landing/FeaturesScrollytelling";
 
 /**
  * Brain Expo landing page.
@@ -217,7 +218,10 @@ export const BrainExpoLanding = () => {
 
   return (
     <motion.div
-      className="min-h-screen bg-[#e9e9e9] text-[#1b1b22] overflow-x-hidden antialiased"
+      // `overflow-x-clip` (not `-hidden`): clipping alone, without turning this
+      // wrapper into a scroll container — which would break `position: sticky`
+      // inside it (the scrollytelling tour depends on it).
+      className="min-h-screen bg-[#e9e9e9] text-[#1b1b22] overflow-x-clip antialiased"
       initial="hidden"
       animate="visible"
       variants={v.root}
@@ -267,7 +271,7 @@ export const BrainExpoLanding = () => {
 
             <div className="hidden md:flex items-center gap-8">
               {[
-                ["Features", "#features"],
+                ["Features", "#tour"],
                 ["Products", "#products"],
                 ["Integrations", "#integrations"],
                 ["Reviews", "#reviews"],
@@ -325,7 +329,7 @@ export const BrainExpoLanding = () => {
         {isNavOpen && (
           <div className="md:hidden absolute left-4 right-4 top-full mt-2 rounded-2xl border border-white/10 bg-[#1b1b22] px-4 py-3 shadow-lg flex flex-col gap-1">
             {[
-              ["Features", "#features"],
+              ["Features", "#tour"],
               ["Products", "#products"],
               ["Integrations", "#integrations"],
               ["Reviews", "#reviews"],
@@ -480,6 +484,9 @@ export const BrainExpoLanding = () => {
           </div>
         </div>
       </section>
+
+      {/* ---------- Guided product tour (scrollytelling) ---------- */}
+      <FeaturesScrollytelling />
 
       {/* ---------- Feature highlight ---------- */}
       <section id="features" className="max-w-6xl mx-auto px-4 sm:px-6 py-24">
