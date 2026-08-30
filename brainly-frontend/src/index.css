@@ -145,6 +145,25 @@ body {
   .orb-glow, .wire-flow, .hero-float { animation: none; }
 }
 
+/* ---------------------------------------------------------------------------
+   Landing page: clickable things look clickable.
+
+   Tailwind v4 removed `button { cursor: pointer }` from preflight, so a native
+   <button> falls back to the browser default — an arrow. Links keep the hand
+   because that is the UA default for an <a href>, which is why only the buttons
+   looked dead: the nav toggle, the tour's step list, the type filter chips and
+   the revoke control. Scoped to the landing root rather than set globally, so
+   the app's own screens keep whatever they set for themselves.
+--------------------------------------------------------------------------- */
+.landing-root :is(button, [role="button"], summary):not(:disabled):not([aria-disabled="true"]) {
+  cursor: pointer;
+}
+
+.landing-root :is(button, [role="button"]):disabled,
+.landing-root [role="button"][aria-disabled="true"] {
+  cursor: not-allowed;
+}
+
 /* Landing page marquee tickers (integrations + testimonials) */
 @keyframes marqueeLeft {
   from { transform: translateX(0); }
