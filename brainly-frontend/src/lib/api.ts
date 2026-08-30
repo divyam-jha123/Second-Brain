@@ -131,6 +131,7 @@ export type Me = {
   email: string | null;
   topics: string[];
   onboardingCompletedAt: string | null;
+  tourCompletedAt: string | null;
 };
 
 export const syncUser = async (
@@ -166,6 +167,10 @@ export const completeOnboarding = async (
   payload: OnboardingPayload,
 ): Promise<void> => {
   await axios.post(`${API_URL}/user/onboarding`, payload, authConfig(token));
+};
+
+export const completeTour = async (token: string | null): Promise<void> => {
+  await axios.post(`${API_URL}/user/tour-complete`, {}, authConfig(token));
 };
 
 export type EmailPrefs = {

@@ -24,6 +24,7 @@ import { useOnboardingStatus } from "../hooks/useOnboardingStatus";
 import { getContentType } from "../lib/notes";
 import { readDefaultView } from "../lib/prefs";
 import { useSettingsDialog } from "./settings/useSettingsDialog";
+import { TourProvider } from "../tour/TourProvider";
 import type { ViewMode } from "../lib/prefs";
 import {
   createCollection,
@@ -103,8 +104,13 @@ export const Dashboard = () => {
   useEmailSync();
 
   // Floats the onboarding card over the dashboard until it's done or skipped.
-  const { status: onboardingStatus, markComplete: markOnboarded } =
-    useOnboardingStatus();
+  const {
+    status: onboardingStatus,
+    markComplete: markOnboarded,
+    tourStatus,
+    markTourComplete,
+  } = useOnboardingStatus();
+  const [tourTrigger, setTourTrigger] = useState(false);
 
   // Tags aren't stored yet, so every note counts as unsorted.
   const inboxCount = useMemo(
@@ -308,6 +314,7 @@ export const Dashboard = () => {
     );
 
   return (
+    <TourProvider autoStart={tourTrigger} onComplete={markTourComplete}>
     <div className="relative flex min-h-screen bg-bg pb-24 md:pb-0">
       <div className="hidden md:block">
         <Sidebar
@@ -362,6 +369,7 @@ export const Dashboard = () => {
             markOnboarded();
             // Topics become collections, so the sidebar needs a refresh.
             getSidebarData();
+            if (tourStatus === "needed") setTourTrigger(true);
           }}
         />
       )}
@@ -378,6 +386,7 @@ export const Dashboard = () => {
           </div>
           <button
             type="button"
+            data-tour-id="dashboard-settings-mobile"
             onClick={() => openSettings("account")}
             title="Settings"
             aria-label="Settings"
@@ -391,7 +400,7 @@ export const Dashboard = () => {
 
         {/* Search + primary action */}
         <div className="mb-5 flex items-center gap-3">
-          <div className="relative flex-1">
+          <div className="relative flex-1" data-tour-id="dashboard-search">
             <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-fg-subtle">
               <LuSearch size={17} />
             </span>
@@ -411,6 +420,7 @@ export const Dashboard = () => {
 
           <button
             type="button"
+            data-tour-id="dashboard-add"
             onClick={() => setModalOpen(true)}
             className="hidden shrink-0 items-center gap-2 rounded-xl bg-accent px-5 py-3 text-sm font-semibold text-accent-fg transition-colors hover:bg-accent-hover md:flex cursor-pointer"
           >
@@ -419,6 +429,7 @@ export const Dashboard = () => {
           </button>
           <button
             type="button"
+            data-tour-id="dashboard-share"
             onClick={() => setShareModalOpen(true)}
             title="Share brain"
             aria-label="Share brain"
@@ -430,7 +441,7 @@ export const Dashboard = () => {
 
         {/* Filter chips + sort / view */}
         <div className="mb-5 flex items-center justify-between gap-4 border-b border-line pb-4">
-          <div className="scrollbar-hide -mx-1 flex gap-2 overflow-x-auto px-1">
+          <div className="scrollbar-hide -mx-1 flex gap-2 overflow-x-auto px-1" data-tour-id="dashboard-filters">
             {CHIPS.map((chip) => (
               <button
                 key={chip.value}
@@ -447,7 +458,7 @@ export const Dashboard = () => {
             ))}
           </div>
 
-          <div className="flex shrink-0 items-center gap-1">
+          <div className="flex shrink-0 items-center gap-1" data-tour-id="dashboard-view-toggle">
             <button
               type="button"
               onClick={cycleSort}
@@ -493,7 +504,10 @@ export const Dashboard = () => {
 
         {/* Cards */}
         {visibleNotes.length === 0 ? (
-          <div className="flex flex-col items-center gap-2 rounded-xl border border-dashed border-line py-20 text-center">
+          <div
+            data-tour-id="dashboard-cards"
+            className="flex flex-col items-center gap-2 rounded-xl border border-dashed border-line py-20 text-center"
+          >
             <span className="text-fg-subtle">
               <LuInbox size={26} />
             </span>
@@ -508,6 +522,7 @@ export const Dashboard = () => {
           </div>
         ) : (
           <div
+            data-tour-id="dashboard-cards"
             className={
               viewMode === "grid"
                 ? "grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3"
@@ -543,6 +558,7 @@ export const Dashboard = () => {
 
       {/* Floating Action Button (FAB for Mobile) */}
       <button
+        data-tour-id="dashboard-fab"
         onClick={() => setModalOpen(true)}
         aria-label="Add content"
         className="fixed bottom-24 right-6 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-accent text-accent-fg shadow-lg transition-transform hover:bg-accent-hover active:scale-95 md:hidden cursor-pointer"
@@ -551,7 +567,10 @@ export const Dashboard = () => {
       </button>
 
       {/* Mobile Bottom Navigation */}
-      <nav className="fixed bottom-0 left-0 right-0 z-40 flex items-center justify-around border-t border-line bg-surface px-4 pb-5 pt-2 md:hidden">
+      <nav
+        data-tour-id="dashboard-bottom-nav"
+        className="fixed bottom-0 left-0 right-0 z-40 flex items-center justify-around border-t border-line bg-surface px-4 pb-5 pt-2 md:hidden"
+      >
         {[
           { value: "all" as const, label: "All", icon: <LuLayoutGrid size={19} /> },
           { value: "inbox" as const, label: "Inbox", icon: <LuInbox size={19} /> },
@@ -580,5 +599,6 @@ export const Dashboard = () => {
         </button>
       </nav>
     </div>
+    </TourProvider>
   );
 };

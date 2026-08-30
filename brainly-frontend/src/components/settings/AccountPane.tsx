@@ -210,10 +210,6 @@ export const AccountPane = () => {
             Edit profile
           </QuietButton>
         </div>
-        <div className="flex items-center gap-2 border-t border-line px-4 py-3 text-[13px] text-fg-muted">
-          <LuShieldCheck size={15} className="shrink-0" />
-          Password, connected accounts and sessions are managed by Clerk.
-        </div>
       </Panel>
 
       <GroupLabel>Preferences</GroupLabel>

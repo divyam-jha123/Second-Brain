@@ -7,6 +7,7 @@ interface IUser extends Document {
   /** Topics picked during onboarding; used to suggest tags. */
   topics: string[];
   onboardingCompletedAt: Date | null;
+  tourCompletedAt: Date | null;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -32,6 +33,12 @@ const userSchema = new Schema<IUser>({
   // Null means the user has not been through onboarding yet. Skipping still
   // stamps this, so the flow is never shown twice.
   onboardingCompletedAt: {
+    type: Date,
+    default: null,
+  },
+  // Null means the dashboard tour has not been shown yet. Skipping it still
+  // stamps this, so it is never shown twice.
+  tourCompletedAt: {
     type: Date,
     default: null,
   },

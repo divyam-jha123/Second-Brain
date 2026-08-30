@@ -44,6 +44,7 @@ const NavItem = ({
   badge,
   onClick,
   onDelete,
+  tourId,
 }: {
   icon: React.ReactNode;
   label: string;
@@ -51,8 +52,9 @@ const NavItem = ({
   badge?: number;
   onClick?: () => void;
   onDelete?: () => void;
+  tourId?: string;
 }) => (
-  <div className="group/item relative flex items-center">
+  <div className="group/item relative flex items-center" data-tour-id={tourId}>
     <button
       type="button"
       onClick={onClick}
@@ -135,6 +137,7 @@ export const Sidebar = ({
     <aside className="fixed left-0 top-0 flex h-screen w-64 flex-col border-r border-line bg-surface">
       <button
         type="button"
+        data-tour-id="sidebar-home"
         className="flex items-center gap-2.5 px-5 py-5 text-left cursor-pointer"
         onClick={() => handleClick("all")}
       >
@@ -147,12 +150,14 @@ export const Sidebar = ({
       <div className="flex-1 overflow-y-auto px-2 pb-4">
         <nav className="flex flex-col gap-0.5">
           <NavItem
+            tourId="sidebar-all"
             icon={<LuLayers />}
             label="All"
             isActive={activeFilter === "all" && !activeCollectionId && !activeTag}
             onClick={() => handleClick("all")}
           />
           <NavItem
+            tourId="sidebar-inbox"
             icon={<LuInbox />}
             label="Inbox"
             badge={inboxCount}
@@ -162,7 +167,7 @@ export const Sidebar = ({
         </nav>
 
         <SectionLabel>Collections</SectionLabel>
-        <div className="flex flex-col gap-0.5">
+        <div className="flex flex-col gap-0.5" data-tour-id="sidebar-collections">
           {collections.map((collection) => (
             <NavItem
               key={collection._id}
@@ -211,7 +216,7 @@ export const Sidebar = ({
         </div>
 
         <SectionLabel>Tags</SectionLabel>
-        <div className="flex flex-wrap gap-1.5 px-3">
+        <div className="flex flex-wrap gap-1.5 px-3" data-tour-id="sidebar-tags">
           {tags.length === 0 ? (
             <p className="text-xs text-fg-subtle">No tags yet</p>
           ) : (
@@ -247,7 +252,9 @@ export const Sidebar = ({
         </div>
       </div>
 
-      <AccountMenu savedCount={savedCount} />
+      <div data-tour-id="sidebar-account">
+        <AccountMenu savedCount={savedCount} />
+      </div>
 
     </aside>
   );

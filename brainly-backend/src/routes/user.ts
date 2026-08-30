@@ -77,6 +77,7 @@ router.get("/me", requireAuth(), async (req: Request, res: Response) => {
         email: user?.email ?? null,
         topics: user?.topics ?? [],
         onboardingCompletedAt: user?.onboardingCompletedAt ?? null,
+        tourCompletedAt: user?.tourCompletedAt ?? null,
       },
     });
   } catch (error) {
@@ -159,6 +160,33 @@ router.post("/onboarding", requireAuth(), async (req: Request, res: Response) =>
   } catch (error) {
     console.error("Onboarding error:", error);
     return res.status(500).json({ msg: "Error completing onboarding", error });
+  }
+});
+
+// ─── POST /user/tour-complete ───────────────────────────────────────
+// Stamps the dashboard tour as seen, whether it was finished or skipped.
+router.post("/tour-complete", requireAuth(), async (req: Request, res: Response) => {
+  try {
+    const { userId } = getAuth(req);
+
+    if (!userId) {
+      return res.status(401).json({ msg: "Not authenticated" });
+    }
+
+    const user = await User.findOneAndUpdate(
+      { clerkUserId: userId },
+      { tourCompletedAt: new Date() },
+      { new: true },
+    );
+
+    if (!user) {
+      return res.status(409).json({ msg: "Sync the user before completing the tour" });
+    }
+
+    return res.json({ msg: "success", tourCompletedAt: user.tourCompletedAt });
+  } catch (error) {
+    console.error("Tour completion error:", error);
+    return res.status(500).json({ msg: "Error completing tour", error });
   }
 });
 
