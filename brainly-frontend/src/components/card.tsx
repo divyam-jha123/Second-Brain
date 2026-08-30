@@ -4,6 +4,7 @@ import { DocumentIcon } from "../icons/documentIcon";
 import { TwitterIcon } from "../icons/twitterIcon";
 import { VideoIcon } from "../icons/videoIcon";
 import { LinkedinIcon } from "../icons/linkedinIcon";
+import { PodcastIcon } from "../icons/podcastIcon";
 import { getRelativeTime, getSourceDomain } from "../lib/notes";
 import { whenTwitterReady } from "../lib/twitter";
 import type { Collection } from "../lib/api";
@@ -37,6 +38,7 @@ const typeIcons: Record<CardType, React.ReactElement> = {
   tweet: <TwitterIcon size="sm" />,
   video: <VideoIcon size="sm" />,
   linkedin: <LinkedinIcon size="sm" />,
+  podcast: <PodcastIcon size="sm" />,
 };
 
 /** Glyph shown on the preview tile when there is no real thumbnail. */
@@ -45,6 +47,7 @@ const previewGlyphs: Record<CardType, React.ReactElement> = {
   tweet: <LuLink size={30} />,
   linkedin: <LuLink size={30} />,
   document: <LuLink size={30} />,
+  podcast: <LuPlay size={30} />,
 };
 
 const YOUTUBE_ID = /(?:v=|youtu\.be\/|embed\/|shorts\/)([\w-]{11})/;
@@ -68,7 +71,8 @@ export const Card = (props: CardProps) => {
   // Only these two render their real embed in the grid; without content there
   // is nothing to embed, so fall back to the glyph tile.
   const isLiveEmbed =
-    (props.type === "tweet" || props.type === "linkedin") && !!props.content;
+    (props.type === "tweet" || props.type === "linkedin" || props.type === "podcast") &&
+    !!props.content;
 
   useEffect(() => {
     if (props.type !== "tweet") return;
@@ -171,6 +175,34 @@ export const Card = (props: CardProps) => {
             allowFullScreen={true}
             title={props.title}
           ></iframe>
+        );
+      })()}
+
+      {props.type === "podcast" && props.content && (() => {
+        const spotifyMatch = props.content.match(
+          /open\.spotify\.com\/(episode|show)\/([\w]+)/,
+        );
+        if (spotifyMatch) {
+          return (
+            <iframe
+              src={`https://open.spotify.com/embed/${spotifyMatch[1]}/${spotifyMatch[2]}`}
+              className="w-full rounded-lg"
+              height="152"
+              frameBorder="0"
+              allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+              title={props.title}
+            ></iframe>
+          );
+        }
+        return (
+          <a
+            href={props.content}
+            target="_blank"
+            rel="noreferrer"
+            className="text-sm leading-relaxed text-accent break-words hover:underline"
+          >
+            {props.content}
+          </a>
         );
       })()}
 

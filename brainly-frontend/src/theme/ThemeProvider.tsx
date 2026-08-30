@@ -16,7 +16,7 @@ const readStoredTheme = (): ThemePreference => {
   } catch {
     // Private mode / blocked storage — fall through to the default.
   }
-  return "system";
+  return "light";
 };
 
 const systemTheme = (): ResolvedTheme =>

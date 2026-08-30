@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { CrossIcon } from "../icons/crossicon";
 import { Button } from "./button";
+import { getContentType } from "../lib/notes";
+import type { ContentType } from "../lib/notes";
 
 interface CreateModalProps {
   isOpen: boolean;
@@ -104,10 +106,17 @@ export const CreateModal = ({ isOpen, onClose, onSubmit }: CreateModalProps) => 
                         <label className="block text-sm font-medium text-fg-muted mb-2">
                             Content Type
                         </label>
-                        <div className="flex gap-2">
-                            <TypeButton label="Twitter" active={link.includes("twitter") || link.includes("x.com")} />
-                            <TypeButton label="YouTube" active={link.includes("youtube")} />
-                            <TypeButton label="Article" active={!link.includes("twitter") && !link.includes("youtube") && !link.includes("x.com")} />
+                        <div className="flex flex-wrap gap-2">
+                            {(() => {
+                                const detected = getContentType(link.trim() || undefined);
+                                return TYPE_OPTIONS.map((option) => (
+                                    <TypeButton
+                                        key={option.type}
+                                        label={option.label}
+                                        active={detected === option.type}
+                                    />
+                                ));
+                            })()}
                         </div>
                     </div>
                 </div>
@@ -124,6 +133,14 @@ export const CreateModal = ({ isOpen, onClose, onSubmit }: CreateModalProps) => 
         </div>
     );
 };
+
+const TYPE_OPTIONS: { type: ContentType; label: string }[] = [
+    { type: "tweet", label: "Twitter" },
+    { type: "video", label: "YouTube" },
+    { type: "linkedin", label: "LinkedIn" },
+    { type: "podcast", label: "Podcast" },
+    { type: "document", label: "Article" },
+];
 
 // Helper component for content type buttons
 const TypeButton = ({ label, active }: { label: string; active: boolean }) => (

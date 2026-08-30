@@ -66,6 +66,7 @@ const CHIPS: { value: ContentFilter; label: string }[] = [
   { value: "video", label: "Videos" },
   { value: "tweet", label: "Tweets" },
   { value: "linkedin", label: "LinkedIn" },
+  { value: "podcast", label: "Podcasts" },
   { value: "document", label: "Docs" },
 ];
 

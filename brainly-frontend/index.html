@@ -13,7 +13,7 @@
           var stored = localStorage.getItem('brain-expo-theme');
           var dark =
             stored === 'dark' ||
-            ((stored === 'system' || !stored) &&
+            (stored === 'system' &&
               window.matchMedia('(prefers-color-scheme: dark)').matches);
           document.documentElement.classList.toggle('dark', dark);
           document.documentElement.style.colorScheme = dark ? 'dark' : 'light';

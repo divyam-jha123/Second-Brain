@@ -18,6 +18,7 @@ export type ContentFilter =
   | "video"
   | "document"
   | "linkedin"
+  | "podcast"
   | "settings";
 
 interface SidebarProps {

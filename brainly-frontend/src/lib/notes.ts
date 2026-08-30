@@ -1,4 +1,4 @@
-export type ContentType = "tweet" | "video" | "document" | "linkedin";
+export type ContentType = "tweet" | "video" | "document" | "linkedin" | "podcast";
 
 /**
  * The backend stores a note as { title, content } where `content` is the saved
@@ -9,6 +9,14 @@ export const getContentType = (content: string | undefined): ContentType => {
   if (content?.includes("youtube") || content?.includes("youtu.be")) return "video";
   if (content?.includes("twitter") || content?.includes("x.com")) return "tweet";
   if (content?.includes("linkedin.com")) return "linkedin";
+  if (
+    content?.includes("open.spotify.com/episode") ||
+    content?.includes("open.spotify.com/show") ||
+    content?.includes("podcasts.apple.com") ||
+    content?.includes("anchor.fm") ||
+    content?.includes("pca.st")
+  )
+    return "podcast";
   return "document";
 };
 
