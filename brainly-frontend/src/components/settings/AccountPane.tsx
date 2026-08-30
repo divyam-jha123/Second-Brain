@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useAuth, useClerk, useUser } from "@clerk/react";
-import { LuCheck, LuCopy, LuShieldCheck } from "react-icons/lu";
+import { LuCheck, LuCopy } from "react-icons/lu";
 import {
   createShareLink,
   fetchEmailPrefs,
@@ -209,10 +209,6 @@ export const AccountPane = () => {
           <QuietButton onClick={() => openUserProfile()}>
             Edit profile
           </QuietButton>
-        </div>
-        <div className="flex items-center gap-2 border-t border-line px-4 py-3 text-[13px] text-fg-muted">
-          <LuShieldCheck size={15} className="shrink-0" />
-          Password, connected accounts and sessions are managed by Clerk.
         </div>
       </Panel>
 
