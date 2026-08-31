@@ -37,7 +37,7 @@ export const SharedDashboard = () => {
 
   if (loading) {
     return (
-      <Loader message="Loading shared brain..." />
+      <Loader />
     );
   }
 
