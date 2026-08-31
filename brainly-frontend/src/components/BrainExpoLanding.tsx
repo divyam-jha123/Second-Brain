@@ -30,6 +30,10 @@ import { ClosingCTA } from "./landing/ClosingCTA";
  */
 
 const HERO_HEADER_ACCENT = "#774CFF";
+// The Brain Expo mark is the same colour here as in the app: --brand, light
+// (#774CFF) on the light header, and the dark-theme value on the dark footer.
+const BRAND_MARK = "#774CFF";
+const BRAND_MARK_ON_DARK = "#8F6CFF";
 const LANDING_ACCENT = "#2563EB";
 const PRIMARY_GRADIENT = "linear-gradient(90deg, #2563EB 0%, #3B82F6 55%, #60A5FA 100%)";
 const PRIMARY_HOVER_GRADIENT = "linear-gradient(90deg, #1D4ED8 0%, #2563EB 55%, #3B82F6 100%)";
@@ -199,7 +203,7 @@ export const BrainExpoLanding = () => {
             }}
           >
             <div className="flex items-center gap-2.5">
-              <span style={{ color: LANDING_ACCENT }}>
+              <span style={{ color: BRAND_MARK }}>
                 <BrainExpoLogo size="lg" />
               </span>
               <span className="text-xl font-bold tracking-tight text-[#0F172A]">Brain Expo</span>
@@ -428,7 +432,7 @@ export const BrainExpoLanding = () => {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-10">
             <div className="col-span-2 md:col-span-1">
               <div className="flex items-center gap-2.5 text-white">
-                <span style={{ color: "#60A5FA" }}>
+                <span style={{ color: BRAND_MARK_ON_DARK }}>
                   <BrainExpoLogo size="lg" />
                 </span>
                 <span className="text-lg font-bold">Brain Expo</span>
