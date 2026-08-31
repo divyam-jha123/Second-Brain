@@ -1,0 +1,18 @@
+# Auto-loaded by `docker compose up` — this is the local dev configuration.
+# For a production-parity run instead: docker compose -f docker-compose.yml up
+services:
+  api:
+    build:
+      context: .
+      target: dev
+    image: brainexpo-backend:dev
+    # Source is mounted read-only; tsc only ever reads it. node_modules and
+    # dist stay inside the container, so the host tree is never clobbered.
+    volumes:
+      - ./src:/app/src:ro
+      - ./tsconfig.json:/app/tsconfig.json:ro
+    environment:
+      NODE_ENV: development
+    # nodemon restarts on every save, so the healthcheck would flap.
+    healthcheck:
+      disable: true
