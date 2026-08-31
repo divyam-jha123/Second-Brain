@@ -35,7 +35,8 @@ import { featureIndexAt, features, type FeatureScene } from "./features.data";
  */
 
 const EASE = [0.22, 1, 0.36, 1] as const;
-const ACCENT = "#774CFF";
+const ACCENT = "#2563EB";
+const HIGHLIGHT_GRADIENT = "linear-gradient(90deg, #2563EB 0%, #3B82F6 54%, #60A5FA 100%)";
 /** Track height. Uneven slices in features.data.ts divide it up. */
 const TRACK_VH = 560;
 
@@ -50,7 +51,7 @@ export function FeaturesScrollytelling() {
     // The page root already clips the horizontal bleed.
     <section
       id="tour"
-      className="relative scroll-mt-24 border-y border-gray-100 bg-[#F8F8FB]"
+      className="relative scroll-mt-24 border-y border-[#CBD5E1] bg-[#F8FAFC]"
       aria-label="How Brain Expo works"
     >
       {/* Shared ground: one soft field both columns sit on. */}
@@ -59,7 +60,7 @@ export function FeaturesScrollytelling() {
         className="pointer-events-none absolute inset-0"
         style={{
           background:
-            "radial-gradient(120% 70% at 72% 42%, rgba(119,76,255,0.10) 0%, rgba(119,76,255,0.03) 38%, transparent 68%)",
+            "radial-gradient(120% 70% at 72% 42%, rgba(37,99,235,0.12) 0%, rgba(59,130,246,0.05) 38%, transparent 68%)",
         }}
       />
       <SectionIntro />
@@ -84,12 +85,21 @@ function SectionIntro() {
       >
         How Brain Expo works
       </p>
-      <h2 className="font-hero mt-4 text-[34px] leading-[1.06] font-bold tracking-tight text-balance text-gray-900 sm:text-[44px] lg:text-[52px]">
+      <h2 className="font-hero mt-4 text-[34px] leading-[1.06] font-bold tracking-tight text-balance text-[#0F172A] sm:text-[44px] lg:text-[52px]">
         Don't just save it.
         <br />
-        <span style={{ color: ACCENT }}>Remember it.</span>
+        <span
+          style={{
+            backgroundImage: HIGHLIGHT_GRADIENT,
+            color: "transparent",
+            WebkitBackgroundClip: "text",
+            backgroundClip: "text",
+          }}
+        >
+          Remember it.
+        </span>
       </h2>
-      <p className="mx-auto mt-5 max-w-[52ch] text-base leading-relaxed text-pretty text-gray-500 sm:text-[17px]">
+      <p className="mx-auto mt-5 max-w-[52ch] text-base leading-relaxed text-pretty text-[#475569] sm:text-[17px]">
         Brain Expo captures what you discover, brings the important ideas back
         when they're worth revisiting, and lets you share what you've gathered
         with anyone.
@@ -166,7 +176,7 @@ function PinnedTour() {
               className="pointer-events-none absolute -inset-y-32 -left-32 right-0"
               style={{
                 background:
-                  "linear-gradient(to right, #F8F8FB 0, #F8F8FB calc(100% - var(--tour-gutter)), rgba(248,248,251,0) 100%)",
+                  "linear-gradient(to right, #F8FAFC 0, #F8FAFC calc(100% - var(--tour-gutter)), rgba(248,250,252,0) 100%)",
               }}
             />
 
@@ -185,17 +195,17 @@ function PinnedTour() {
                     exit={reduce ? { opacity: 0 } : { opacity: 0, y: -10, filter: "blur(4px)" }}
                     transition={{ duration: reduce ? 0.2 : 0.4, ease: EASE }}
                   >
-                    <p className="flex items-center gap-3 text-[11px] font-semibold tracking-[0.16em] text-gray-400 tabular-nums">
+                    <p className="flex items-center gap-3 text-[11px] font-semibold tracking-[0.16em] text-[#64748B] tabular-nums">
                       {numberLabel(activeIndex)}
-                      <span aria-hidden className="h-px w-6 bg-gray-300" />
+                      <span aria-hidden className="h-px w-6 bg-[#CBD5E1]" />
                       <span className="tracking-[0.16em] uppercase" style={{ color: ACCENT }}>
                         {active.navLabel}
                       </span>
                     </p>
-                    <h3 className="font-hero mt-4 max-w-[15ch] text-[30px] leading-[1.1] font-bold tracking-tight text-balance text-gray-900 xl:text-[35px] 2xl:text-[39px]">
+                    <h3 className="font-hero mt-4 max-w-[15ch] text-[30px] leading-[1.1] font-bold tracking-tight text-balance text-[#0F172A] xl:text-[35px] 2xl:text-[39px]">
                       {active.title}
                     </h3>
-                    <p className="mt-4 max-w-[44ch] text-[15px] leading-relaxed text-pretty text-gray-500 xl:text-base">
+                    <p className="mt-4 max-w-[44ch] text-[15px] leading-relaxed text-pretty text-[#475569] xl:text-base">
                       {active.description}
                     </p>
                   </motion.div>
@@ -206,7 +216,7 @@ function PinnedTour() {
               <div className="mt-9 flex gap-5">
                 <div
                   aria-hidden
-                  className="relative w-px shrink-0 overflow-hidden rounded-full bg-gray-200"
+                  className="relative w-px shrink-0 overflow-hidden rounded-full bg-[#CBD5E1]"
                 >
                   <motion.div
                     className="absolute inset-0 origin-top rounded-full"
@@ -223,16 +233,16 @@ function PinnedTour() {
                           type="button"
                           onClick={() => goToFeature(index)}
                           aria-current={isActive ? "step" : undefined}
-                          className={`group flex items-baseline gap-3 rounded-md py-1.5 text-left text-[15px] transition-colors focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#774CFF] ${
+                          className={`group flex items-baseline gap-3 rounded-md py-1.5 text-left text-[15px] transition-colors focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#2563EB] ${
                             isActive
-                              ? "font-semibold text-gray-900"
-                              : "font-medium text-gray-400 hover:text-gray-700"
+                              ? "font-semibold text-[#0F172A]"
+                              : "font-medium text-[#64748B] hover:text-[#475569]"
                           }`}
                         >
                           <span
                             aria-hidden
                             className="h-1.5 w-1.5 shrink-0 rounded-full transition-colors"
-                            style={{ backgroundColor: isActive ? ACCENT : "#D4D4D8" }}
+                            style={{ backgroundColor: isActive ? ACCENT : "#CBD5E1" }}
                           />
                           {feature.navLabel}
                         </button>
@@ -292,17 +302,17 @@ function StackedFeature({ feature, index }: { feature: FeatureScene; index: numb
       viewport={{ once: true, amount: 0.25 }}
       transition={{ duration: 0.6, ease: EASE }}
     >
-      <p className="flex items-center gap-3 text-[11px] font-semibold tracking-[0.16em] text-gray-400 tabular-nums">
+      <p className="flex items-center gap-3 text-[11px] font-semibold tracking-[0.16em] text-[#64748B] tabular-nums">
         {numberLabel(index)} / {TOTAL}
-        <span aria-hidden className="h-px w-5 bg-gray-300" />
+        <span aria-hidden className="h-px w-5 bg-[#CBD5E1]" />
         <span className="tracking-[0.16em] uppercase" style={{ color: ACCENT }}>
           {feature.navLabel}
         </span>
       </p>
-      <h3 className="font-hero mt-3 text-[26px] leading-[1.14] font-bold tracking-tight text-balance text-gray-900 sm:text-3xl">
+      <h3 className="font-hero mt-3 text-[26px] leading-[1.14] font-bold tracking-tight text-balance text-[#0F172A] sm:text-3xl">
         {feature.title}
       </h3>
-      <p className="mt-3 text-[15px] leading-relaxed text-pretty text-gray-500 sm:text-base">
+      <p className="mt-3 text-[15px] leading-relaxed text-pretty text-[#475569] sm:text-base">
         {feature.description}
       </p>
 

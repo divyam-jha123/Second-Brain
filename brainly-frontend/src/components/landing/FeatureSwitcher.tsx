@@ -18,6 +18,7 @@ import { motion, useReducedMotion } from "motion/react";
 const EASE = [0.22, 1, 0.36, 1] as const;
 /** Long enough to read a card, short enough to notice it is alive. */
 const CYCLE_MS = 2600;
+const PRIMARY_GRADIENT = "linear-gradient(90deg, #2563EB 0%, #3B82F6 55%, #60A5FA 100%)";
 
 type TypeId =
   | "articles"
@@ -165,10 +166,10 @@ export function FeatureSwitcher() {
     >
       <div className="mx-auto max-w-6xl">
       <div className="mx-auto max-w-2xl text-center">
-        <h2 className="font-hero text-3xl font-bold tracking-tight text-balance sm:text-4xl">
+        <h2 className="font-hero text-3xl font-bold tracking-tight text-balance text-[#0F172A] sm:text-4xl">
           Everything you save, in one library
         </h2>
-        <p className="mt-4 leading-relaxed text-pretty text-gray-500">
+        <p className="mt-4 leading-relaxed text-pretty text-[#475569]">
           Articles, videos, podcasts, PDFs, tweets, notes and links all land in
           the same place. Pick a type to see what that looks like.
         </p>
@@ -188,11 +189,12 @@ export function FeatureSwitcher() {
               type="button"
               onClick={() => pick(type.id)}
               aria-pressed={isActive}
-              className={`inline-flex min-h-[40px] items-center gap-2 rounded-full border px-4 text-sm font-medium transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#774CFF] ${
+              className={`inline-flex min-h-[40px] items-center gap-2 rounded-full border px-4 text-sm font-medium transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2563EB] ${
                 isActive
-                  ? "border-transparent bg-[#1b1b22] text-white"
-                  : "border-gray-200 bg-white text-gray-600 hover:border-gray-300 hover:text-gray-900"
+                  ? "border-transparent text-white shadow-[0_10px_22px_-14px_rgba(37,99,235,0.65)]"
+                  : "border-[#CBD5E1] bg-white text-[#64748B] hover:border-[#94A3B8] hover:text-[#475569]"
               }`}
+              style={isActive ? { background: PRIMARY_GRADIENT } : undefined}
             >
               <span
                 aria-hidden
@@ -241,14 +243,14 @@ function ItemCard({
           : { opacity: matches ? 1 : 0.32, scale: matches ? 1 : 0.97, y: matches ? 0 : 4 }
       }
       transition={{ duration: reduce ? 0 : 0.38, ease: EASE }}
-      className="rounded-2xl border border-gray-200 bg-white p-5"
+      className="rounded-2xl border border-[#CBD5E1] bg-white p-5"
       style={{
         boxShadow: matches
-          ? "0 1px 2px rgba(16,12,40,0.04), 0 14px 30px -18px rgba(16,12,40,0.28)"
-          : "0 1px 2px rgba(16,12,40,0.03)",
+          ? "0 1px 2px rgba(15,23,42,0.04), 0 14px 30px -18px rgba(37,99,235,0.28)"
+          : "0 1px 2px rgba(15,23,42,0.03)",
       }}
     >
-      <p className="flex items-center gap-2 text-[11px] font-semibold tracking-wide text-gray-600 uppercase">
+      <p className="flex items-center gap-2 text-[11px] font-semibold tracking-wide text-[#64748B] uppercase">
         <span
           aria-hidden
           className="h-1.5 w-1.5 shrink-0 rounded-full"
@@ -256,20 +258,20 @@ function ItemCard({
         />
         {type.label}
       </p>
-      <h3 className="mt-3 text-[15px] leading-snug font-semibold tracking-tight text-gray-900">
+      <h3 className="mt-3 text-[15px] leading-snug font-semibold tracking-tight text-[#0F172A]">
         {item.title}
       </h3>
-      <p className="mt-2 text-[13px] leading-relaxed text-gray-500">{item.body}</p>
+      <p className="mt-2 text-[13px] leading-relaxed text-[#475569]">{item.body}</p>
       <div className="mt-4 flex flex-wrap items-center gap-2">
         {item.tag && (
           <span
             className="rounded-full px-2.5 py-0.5 text-[11px] font-medium"
-            style={{ backgroundColor: "#EDE9FE", color: "#5B45D6" }}
+            style={{ backgroundColor: "#EFF6FF", color: "#2563EB" }}
           >
             {item.tag}
           </span>
         )}
-        <span className="text-[11px] text-gray-500">{item.meta}</span>
+        <span className="text-[11px] text-[#64748B]">{item.meta}</span>
       </div>
     </motion.article>
   );

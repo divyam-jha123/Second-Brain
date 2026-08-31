@@ -47,7 +47,7 @@ const SCENES = {
  * percentages by a constant, so a resize needs no re-measure at all.
  */
 
-const ACCENT = "#774CFF";
+const ACCENT = "#2563EB";
 
 /** Position of an element inside the design canvas, in canvas pixels. */
 function offsetWithin(element: HTMLElement, root: HTMLElement) {
@@ -169,7 +169,7 @@ export function ProductStage({
   return (
     <div
       ref={stageRef}
-      className={`relative isolate w-full overflow-hidden rounded-[26px] border border-black/[0.07] bg-white shadow-[0_2px_6px_rgba(16,12,40,0.05),0_40px_90px_-40px_rgba(16,12,40,0.35)] ${className}`}
+      className={`relative isolate w-full overflow-hidden rounded-[26px] border border-[#CBD5E1] bg-white shadow-[0_2px_6px_rgba(15,23,42,0.05),0_40px_90px_-40px_rgba(37,99,235,0.30)] ${className}`}
       style={{ aspectRatio: DASHBOARD_ASPECT }}
     >
       {/*
@@ -210,7 +210,7 @@ export function ProductStage({
       {/* Dimming so a product state that comes forward has somewhere to sit. */}
       <motion.div
         aria-hidden
-        className="pointer-events-none absolute inset-0 bg-[#0B0818] backdrop-blur-[3px]"
+        className="pointer-events-none absolute inset-0 bg-[#0F172A] backdrop-blur-[3px]"
         style={{ opacity: scrimOpacity }}
       />
 
@@ -262,7 +262,7 @@ export function ProductStage({
               marginLeft: -3,
               marginTop: -2,
               scale: pointerScale,
-              filter: "drop-shadow(0 4px 10px rgba(16,12,40,0.35))",
+              filter: "drop-shadow(0 4px 10px rgba(15,23,42,0.35))",
             }}
           >
             <path
