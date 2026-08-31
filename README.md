@@ -116,6 +116,67 @@ git clone <this-repo>
 cd Second-Brain
 ```
 
+### One-command Docker dev
+
+From the repo root:
+
+```bash
+docker compose up -d --build
+```
+
+That starts the development stack:
+
+| Service | URL |
+| --- | --- |
+| Web app | http://localhost:5173 |
+| API | http://localhost:8000 |
+| MongoDB | mongodb://localhost:27017/brainly |
+
+The root `compose.yml` is for local development only. It runs Vite and nodemon
+with bind-mounted source, so edits on the host reload inside the containers.
+It defaults to the checked-in local Clerk test keys; create a root `.env` from
+`.env.example` only when you want to override keys, image names, or URLs.
+
+To include the extension Vite dev server as well:
+
+```bash
+docker compose --profile extension up --build
+```
+
+The extension dev server is available at http://localhost:5174. For Chrome's
+unpacked-extension flow, build `brainly-extension/dist` and load that directory
+from `chrome://extensions`.
+
+The backend image is already published at
+`divyamjha/brainexpo-api:version1.0` on Docker Hub. The frontend dev image is
+published as `divyamjha/brainexpo-web:version1.0`. A root `.env` can pin those
+same images explicitly:
+
+```env
+BRAINEXPO_API_IMAGE=divyamjha/brainexpo-api:version1.0
+BRAINEXPO_WEB_IMAGE=divyamjha/brainexpo-web:version1.0
+```
+
+Both repositories use the `version1.0` tag.
+For broad local-dev support, publish backend and frontend images for both
+`linux/amd64` and `linux/arm64`; the current backend tag is ARM64-only.
+
+To rebuild and push the frontend image again:
+
+```bash
+docker buildx build --platform linux/amd64,linux/arm64 --target dev \
+  -t divyamjha/brainexpo-web:version1.0 --push brainly-frontend
+```
+
+Consumers who have the repo and set those same image names can run:
+
+```bash
+docker compose up
+```
+
+Compose pulls the published API and frontend images when they are missing locally,
+then starts MongoDB alongside them for local development.
+
 ### Backend
 
 ```bash
