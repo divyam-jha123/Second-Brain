@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import axios from "axios";
 import { API_URL } from "../config";
+import { BrainLoader } from "../icons/loader";
 
 type UnsubscribeStatus = "loading" | "success" | "error";
 
@@ -49,7 +50,7 @@ export function Unsubscribe() {
         {/* Icon */}
         <div className="mb-6">
           {status === "loading" && (
-            <div className="w-12 h-12 mx-auto border-4 border-purple-200 border-t-purple-600 rounded-full animate-spin" />
+            <BrainLoader size={112} className="mx-auto" ground="#ffffff" />
           )}
           {status === "success" && (
             <div className="w-16 h-16 mx-auto bg-green-100 rounded-full flex items-center justify-center">

@@ -36,6 +36,16 @@
   --danger-soft: #fee2e2;
 
   --overlay: rgb(24 24 27 / 0.45);
+
+  /* Loading mark. Two stops so the brain reads as lit from the top; on the
+     white ground both must clear 3:1 as graphical objects, so light mode uses
+     a deeper range than the dark theme's lavender. */
+  --loader-top: #8B6BFF;
+  --loader-bottom: #5B2FE0;
+  --loader-flare: #5B2FE0;
+  /* How present the un-lit mark is. Dark needs more than light: the same 0.32
+     that reads as a delicate pencil line on white is nearly invisible on #0d0d0e. */
+  --loader-rest: 0.32;
 }
 
 .dark {
@@ -66,6 +76,11 @@
   --danger-soft: #3a1c1c;
 
   --overlay: rgb(0 0 0 / 0.65);
+
+  --loader-top: #CDBFFF;
+  --loader-bottom: #7C51FF;
+  --loader-flare: #DBD0FF;
+  --loader-rest: 0.46;
 }
 
 @theme inline {
@@ -96,6 +111,10 @@
   --color-danger-soft: var(--danger-soft);
 
   --color-overlay: var(--overlay);
+
+  --color-loader-top: var(--loader-top);
+  --color-loader-bottom: var(--loader-bottom);
+  --color-loader-flare: var(--loader-flare);
 }
 
 body {
@@ -545,4 +564,95 @@ body {
 
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
+}
+
+/* ---------------------------------------------------------------------------
+   Loading state: the Brain Expo mark, wired.
+
+   The mark is drawn once at rest, and a second brighter copy of every stroke
+   sits exactly on top of it carrying a single dash. Every path declares
+   `pathLength="1"`, so a dash of `0.3 0.7` is 30% of that stroke whatever its
+   real length is, and driving `stroke-dashoffset` from 1 to 0 walks the dash
+   along it. One keyframe therefore animates the outline and all five folds at
+   the same apparent speed; the per-path delays in loader.tsx are what make the
+   signal read as travelling through the brain rather than six strokes blinking
+   in parallel.
+
+   The whole cycle is 2.2s so a normal fetch shows at least one complete pass.
+--------------------------------------------------------------------------- */
+@keyframes brainSignal {
+  from { stroke-dashoffset: 1; }
+  to   { stroke-dashoffset: 0; }
+}
+
+/* Junctions light up as the signal reaches them, then cool. */
+@keyframes brainNodeFlare {
+  0%, 58%, 100% { fill: var(--loader-ground, var(--bg)); transform: scale(1); }
+  70%           { fill: var(--loader-flare); transform: scale(1.14); }
+}
+
+/* The un-lit mark. Present from the first painted frame so the brand never
+   flashes in. */
+.brain-rest {
+  opacity: var(--loader-rest);
+}
+
+.brain-signal {
+  stroke-dasharray: 0.18 0.82;
+  animation: brainSignal 2.2s linear infinite;
+}
+
+/* The outline is far longer than any fold, so it takes a shorter dash to read
+   as a travelling streak rather than a lit third of the whole silhouette. */
+.brain-signal-outline {
+  stroke-dasharray: 0.1 0.9;
+}
+
+.brain-node {
+  fill: var(--loader-ground, var(--bg));
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: brainNodeFlare 2.2s ease-out infinite;
+}
+
+/* The open-ended fold terminal is solid, not a ring, so it brightens in place
+   instead of filling from the ground colour. */
+.brain-dot {
+  fill: var(--loader-bottom);
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: brainDotFlare 2.2s ease-out infinite;
+}
+
+@keyframes brainDotFlare {
+  0%, 58%, 100% { opacity: 0.35; transform: scale(1); }
+  70%           { opacity: 1; transform: scale(1.5); }
+}
+
+
+@media (prefers-reduced-motion: reduce) {
+  /* Reduced motion still has to say "working". The travelling signal goes and
+     the mark simply sits at full strength, but the junctions keep a slow,
+     movement-free brightness cycle so the state is not mistaken for a frozen
+     screen. */
+  .brain-signal { animation: none; opacity: 0; }
+  .brain-rest { opacity: 1; }
+  .brain-node {
+    animation: brainNodeSettle 2.6s ease-in-out infinite;
+    transform: none;
+  }
+  .brain-dot {
+    animation: brainDotSettle 2.6s ease-in-out infinite;
+    transform: none;
+  }
+}
+
+@keyframes brainDotSettle {
+  0%, 100% { opacity: 0.35; }
+  50%      { opacity: 1; }
+}
+
+@keyframes brainNodeSettle {
+  0%, 100% { fill: var(--loader-ground, var(--bg)); }
+  50%      { fill: var(--loader-bottom); }
 }

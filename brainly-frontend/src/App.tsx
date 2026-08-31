@@ -60,7 +60,7 @@ function HomePage() {
 
   if (!isLoaded) {
     return (
-      <Loader message="Loading..." />
+      <Loader />
     );
   }
 
@@ -76,14 +76,7 @@ function ProtectedDashboard() {
   const { isSignedIn, isLoaded } = useAuth();
 
   if (!isLoaded) {
-    return (
-      <div className="flex items-center justify-center min-h-screen bg-bg">
-        <div className="flex flex-col items-center gap-3">
-          <div className="w-8 h-8 border-4 border-line border-t-accent rounded-full animate-spin" />
-          <p className="text-sm text-fg-muted">Loading...</p>
-        </div>
-      </div>
-    );
+    return <Loader />;
   }
 
   if (!isSignedIn) {
@@ -97,14 +90,7 @@ function ProtectedAdmin() {
   const { isSignedIn, isLoaded } = useAuth();
 
   if (!isLoaded) {
-    return (
-      <div className="flex items-center justify-center min-h-screen bg-bg">
-        <div className="flex flex-col items-center gap-3">
-          <div className="w-8 h-8 border-4 border-line border-t-accent rounded-full animate-spin" />
-          <p className="text-sm text-fg-muted">Loading...</p>
-        </div>
-      </div>
-    );
+    return <Loader />;
   }
 
   if (!isSignedIn) {
