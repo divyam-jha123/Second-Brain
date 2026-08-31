@@ -1,0 +1,38 @@
+services:
+  mongo:
+    image: mongo:latest
+    container_name: brainexpo-mongo
+    restart: unless-stopped
+    ports:
+      # Exposed so you can point Compass / mongosh at localhost:27017.
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+  api:
+    build: .
+    image: brainexpo-backend:local
+    container_name: brainexpo-api
+    restart: unless-stopped
+    # Clerk keys, RESEND_API_KEY, UNSUBSCRIBE_SECRET. Copy .env.example first.
+    env_file:
+      - .env
+    environment:
+      # Overrides whatever .env says — inside the network the database is
+      # reachable at the service name, not localhost.
+      MONGO_URI: mongodb://mongo:27017/brainly
+      PORT: 8000
+    ports:
+      - "8000:8000"
+    depends_on:
+      mongo:
+        condition: service_healthy
+
+volumes:
+  mongo-data:

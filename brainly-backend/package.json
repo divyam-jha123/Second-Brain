@@ -13,6 +13,7 @@
     "build": "tsc -b",
     "start": "node dist/index.js",
     "dev": "npm run build && npm run start",
+    "dev:watch": "nodemon -L --watch src --ext ts --exec \"npm run build && node dist/index.js\"",
     "test": "vitest",
     "test:ci": "vitest run --coverage",
     "ci": "npm run build && npm run test:ci"
