@@ -30,7 +30,8 @@ import {
  * never forces a layout during a pointer stream.
  */
 
-const ACCENT = "#774CFF";
+const ACCENT = "#2563EB";
+const ACCENT_SOFT = "#EFF6FF";
 const EASE = [0.22, 1, 0.36, 1] as const;
 
 interface Service {
@@ -99,13 +100,13 @@ export function ServiceCards() {
   };
 
   return (
-    <section className="border-y border-gray-100 bg-gray-50/60">
+    <section className="border-y border-[#CBD5E1] bg-[#F8FAFC]">
       <div className="mx-auto max-w-6xl px-4 py-24 sm:px-6">
         <div className="mx-auto mb-14 max-w-2xl text-center">
-          <h2 className="font-hero text-3xl font-bold tracking-tight text-balance sm:text-4xl">
+          <h2 className="font-hero text-3xl font-bold tracking-tight text-balance text-[#0F172A] sm:text-4xl">
             Everything your second brain needs
           </h2>
-          <p className="mt-4 text-gray-500">
+          <p className="mt-4 text-[#475569]">
             Five tools that turn saving into remembering.
           </p>
         </div>
@@ -154,7 +155,7 @@ function ServiceCard({
       variants={variants}
       onPointerEnter={onEnter}
       onPointerMove={onMove}
-      className={`group relative overflow-hidden rounded-2xl border border-gray-200 bg-white p-7 transition-shadow duration-300 hover:shadow-[0_1px_2px_rgba(16,12,40,0.04),0_18px_40px_-24px_rgba(16,12,40,0.32)] ${
+      className={`group relative overflow-hidden rounded-2xl border border-[#CBD5E1] bg-white p-7 transition-shadow duration-300 hover:shadow-[0_1px_2px_rgba(15,23,42,0.04),0_18px_40px_-24px_rgba(37,99,235,0.28)] ${
         service.wide ? "lg:col-span-2" : ""
       }`}
     >
@@ -163,26 +164,26 @@ function ServiceCard({
         aria-hidden
         className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
         style={{
-          background: `radial-gradient(340px circle at var(--pointer-x, 50%) var(--pointer-y, 50%), rgba(119,76,255,0.10), transparent 68%)`,
+          background: "radial-gradient(340px circle at var(--pointer-x, 50%) var(--pointer-y, 50%), rgba(37,99,235,0.11), transparent 68%)",
         }}
       />
 
       <div className="relative">
         <div
           className="mb-5 flex h-11 w-11 items-center justify-center rounded-xl transition-transform duration-300 group-hover:-translate-y-0.5"
-          style={{ backgroundColor: "rgba(119,76,255,0.1)", color: ACCENT }}
+          style={{ backgroundColor: ACCENT_SOFT, color: ACCENT }}
         >
           <Icon size={20} strokeWidth={1.9} />
         </div>
-        <h3 className="text-lg font-semibold tracking-tight">{service.title}</h3>
-        <p className="mt-2 text-sm leading-relaxed text-gray-500">{service.text}</p>
+        <h3 className="text-lg font-semibold tracking-tight text-[#0F172A]">{service.title}</h3>
+        <p className="mt-2 text-sm leading-relaxed text-[#475569]">{service.text}</p>
 
         {service.wide && (
           <ul className="mt-6 flex flex-wrap gap-2">
             {SOURCES.map((source) => (
               <li
                 key={source.name}
-                className="flex h-9 w-9 items-center justify-center rounded-lg border border-gray-200 bg-white transition-transform duration-300 group-hover:-translate-y-0.5"
+                className="flex h-9 w-9 items-center justify-center rounded-lg border border-[#CBD5E1] bg-white transition-transform duration-300 group-hover:-translate-y-0.5"
                 style={{ color: source.color }}
                 title={source.name}
               >

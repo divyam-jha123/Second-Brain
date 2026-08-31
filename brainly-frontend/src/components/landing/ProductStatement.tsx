@@ -1,4 +1,5 @@
 import { motion, useReducedMotion, type Variants } from "motion/react";
+import type { CSSProperties } from "react";
 
 /**
  * The page's one statement beat: the argument for Brain Expo in a single
@@ -16,9 +17,11 @@ import { motion, useReducedMotion, type Variants } from "motion/react";
  * scroll-scrubbed sentence reads as sticky when someone scrolls past quickly.
  */
 
-const ACCENT = "#774CFF";
+const TEXT = "#0F172A";
+const MUTED = "#64748B";
+const HIGHLIGHT_GRADIENT = "linear-gradient(90deg, #2563EB 0%, #3B82F6 54%, #60A5FA 100%)";
 /** The ground, continued from the hero so the top of the page reads as one field. */
-const GROUND = "#FAFAFB";
+const GROUND = "#F8FAFC";
 const EASE = [0.22, 1, 0.36, 1] as const;
 
 type Tone = "base" | "muted" | "payoff";
@@ -34,15 +37,19 @@ const SEGMENTS: { text: string; tone: Tone }[] = [
 ];
 
 /**
- * Resolved colours, all checked against GROUND at large-text sizes:
- * base 18.1:1, muted 4.6:1, payoff 4.7:1. "Muted" recedes by hue, never by
- * opacity — a half-transparent grey would have read as the same design and
- * failed the contrast floor.
+ * Resolved colours, all checked against GROUND at large-text sizes. "Muted"
+ * recedes by hue, never by opacity — a half-transparent grey would have read
+ * as the same design and failed the contrast floor.
  */
-const TONE_COLOR: Record<Tone, string> = {
-  base: "#12110F",
-  muted: "#78716C",
-  payoff: ACCENT,
+const TONE_STYLE: Record<Tone, CSSProperties> = {
+  base: { color: TEXT },
+  muted: { color: MUTED },
+  payoff: {
+    backgroundImage: HIGHLIGHT_GRADIENT,
+    color: "transparent",
+    WebkitBackgroundClip: "text",
+    backgroundClip: "text",
+  },
 };
 
 const words = SEGMENTS.flatMap((segment) =>
@@ -86,7 +93,7 @@ export function ProductStatement() {
           <motion.span
             key={`${entry.text}-${index}`}
             className="me-[0.26em] inline-block"
-            style={{ color: TONE_COLOR[entry.tone] }}
+            style={TONE_STYLE[entry.tone]}
             variants={word}
           >
             {entry.text}

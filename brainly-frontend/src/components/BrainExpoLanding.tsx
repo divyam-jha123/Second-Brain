@@ -28,7 +28,10 @@ import { ClosingCTA } from "./landing/ClosingCTA";
  * compliance band -> CTA -> footer. Copy adapted for Brain Expo.
  */
 
-const ACCENT = "#774CFF";
+const HERO_HEADER_ACCENT = "#774CFF";
+const LANDING_ACCENT = "#2563EB";
+const PRIMARY_GRADIENT = "linear-gradient(90deg, #2563EB 0%, #3B82F6 55%, #60A5FA 100%)";
+const PRIMARY_HOVER_GRADIENT = "linear-gradient(90deg, #1D4ED8 0%, #2563EB 55%, #3B82F6 100%)";
 
 // The words the headline (and the hub tag) cycle through, in order.
 const HERO_WORDS = ["organized", "connected", "smarter", "useful", "searchable"];
@@ -163,7 +166,7 @@ export const BrainExpoLanding = () => {
       // `overflow-x-clip` (not `-hidden`): clipping alone, without turning this
       // wrapper into a scroll container — which would break `position: sticky`
       // inside it (the scrollytelling tour depends on it).
-      className="landing-root min-h-screen bg-[#e9e9e9] text-[#1b1b22] overflow-x-clip antialiased"
+      className="landing-root min-h-screen bg-[#F8FAFC] text-[#0F172A] overflow-x-clip antialiased"
       initial="hidden"
       animate="visible"
       variants={v.root}
@@ -186,12 +189,12 @@ export const BrainExpoLanding = () => {
             marginTop: scrolled ? "12px" : "0px",
             borderStyle: "solid",
             borderWidth: "1px",
-            borderColor: scrolled ? "rgba(255,255,255,0.08)" : "transparent",
-            borderBottomColor: scrolled ? "rgba(255,255,255,0.08)" : "rgba(255,255,255,0.08)",
+            borderColor: scrolled ? "#CBD5E1" : "transparent",
+            borderBottomColor: scrolled ? "#CBD5E1" : "rgba(203,213,225,0.75)",
             borderRadius: scrolled ? "9999px" : "0px",
-            backgroundColor: scrolled ? "#1b1b22" : "rgba(27,27,34,0.88)",
+            backgroundColor: scrolled ? "rgba(255,255,255,0.96)" : "rgba(255,255,255,0.88)",
             boxShadow: scrolled
-              ? "0 16px 40px -16px rgba(0,0,0,0.5)"
+              ? "0 16px 40px -18px rgba(15,23,42,0.22)"
               : "0 0 0 0 rgba(0,0,0,0)",
           }}
         >
@@ -205,10 +208,10 @@ export const BrainExpoLanding = () => {
             }}
           >
             <div className="flex items-center gap-2.5">
-              <span style={{ color: ACCENT }}>
+              <span style={{ color: LANDING_ACCENT }}>
                 <BrainExpoLogo size="lg" />
               </span>
-              <span className="text-xl font-bold tracking-tight text-white">Brain Expo</span>
+              <span className="text-xl font-bold tracking-tight text-[#0F172A]">Brain Expo</span>
             </div>
 
             <div className="hidden md:flex items-center gap-8">
@@ -221,7 +224,7 @@ export const BrainExpoLanding = () => {
                 <a
                   key={href}
                   href={href}
-                  className="text-sm font-medium text-gray-300 hover:text-white transition-colors"
+                  className="text-sm font-medium text-[#64748B] hover:text-[#0F172A] transition-colors"
                 >
                   {label}
                 </a>
@@ -231,7 +234,7 @@ export const BrainExpoLanding = () => {
             <div className="flex items-center gap-2 sm:gap-3">
               <button
                 type="button"
-                className="md:hidden inline-flex items-center justify-center rounded-lg border border-white/15 bg-white/5 px-3 py-2 text-white hover:bg-white/10 transition min-h-[44px]"
+                className="md:hidden inline-flex items-center justify-center rounded-lg border border-[#CBD5E1] bg-white px-3 py-2 text-[#0F172A] hover:bg-[#F8FAFC] transition min-h-[44px] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2563EB]"
                 aria-label={isNavOpen ? "Close navigation menu" : "Open navigation menu"}
                 aria-expanded={isNavOpen}
                 onClick={() => setIsNavOpen((v) => !v)}
@@ -247,18 +250,24 @@ export const BrainExpoLanding = () => {
 
               <Link
                 to="/sign-in"
-                className="hidden md:inline-flex text-sm font-medium text-gray-300 hover:text-white transition-colors px-4 py-2"
+                className="hidden md:inline-flex text-sm font-medium text-[#64748B] hover:text-[#0F172A] transition-colors px-4 py-2"
               >
                 Log in
               </Link>
               <Link
                 to="/sign-up"
-                className="text-sm font-medium text-white px-4 py-2 transition-all hover:opacity-90 shadow-sm min-h-[44px] inline-flex items-center justify-center"
+                className="text-sm font-medium text-white px-4 py-2 transition-all hover:shadow-[0_12px_28px_-18px_rgba(37,99,235,0.8)] shadow-sm min-h-[44px] inline-flex items-center justify-center"
                 style={{
-                  backgroundColor: ACCENT,
+                  background: PRIMARY_GRADIENT,
                   borderRadius: scrolled ? "9999px" : "10px",
                   transitionDuration: MORPH,
                   transitionTimingFunction: MORPH_EASE,
+                }}
+                onMouseEnter={(event) => {
+                  event.currentTarget.style.background = PRIMARY_HOVER_GRADIENT;
+                }}
+                onMouseLeave={(event) => {
+                  event.currentTarget.style.background = PRIMARY_GRADIENT;
                 }}
               >
                 Start for free
@@ -269,7 +278,7 @@ export const BrainExpoLanding = () => {
 
         {/* Mobile menu — a separate floating panel so it never clips the pill */}
         {isNavOpen && (
-          <div className="md:hidden absolute left-4 right-4 top-full mt-2 rounded-2xl border border-white/10 bg-[#1b1b22] px-4 py-3 shadow-lg flex flex-col gap-1">
+          <div className="md:hidden absolute left-4 right-4 top-full mt-2 rounded-2xl border border-[#CBD5E1] bg-white px-4 py-3 shadow-[0_18px_42px_-24px_rgba(15,23,42,0.28)] flex flex-col gap-1">
             {[
               ["Features", "#tour"],
               ["Products", "#products"],
@@ -280,12 +289,12 @@ export const BrainExpoLanding = () => {
                 key={href}
                 href={href}
                 onClick={() => setIsNavOpen(false)}
-                className="py-2 text-sm font-medium text-gray-300 hover:text-white"
+                className="py-2 text-sm font-medium text-[#64748B] hover:text-[#0F172A]"
               >
                 {label}
               </a>
             ))}
-            <Link to="/sign-in" className="py-2 text-sm font-medium text-gray-300 hover:text-white">
+            <Link to="/sign-in" className="py-2 text-sm font-medium text-[#64748B] hover:text-[#0F172A]">
               Log in
             </Link>
           </div>
@@ -293,33 +302,33 @@ export const BrainExpoLanding = () => {
       </header>
 
       {/* ---------- Hero ---------- */}
-      <section id="hero" className="relative overflow-hidden bg-[#FAFAFB]">
+      <section id="hero" className="relative overflow-hidden bg-[#F8FAFC]">
         {/*
           Background stack (behind all hero content), painted bottom-to-top:
-          soft violet atmospheric glow -> fine architectural grid -> a near-white
+          soft blue atmospheric glow -> fine architectural grid -> a near-white
           wash that keeps the area behind the heading cleaner so the typography
           stays dominant. Barely-there, never competing with the heading.
         */}
         <div className="pointer-events-none absolute inset-0 z-0" aria-hidden>
-          {/* Ambient glow — very low-opacity violet rising from bottom-centre +
+          {/* Ambient glow — very low-opacity blue rising from bottom-centre +
               lower-right, anchored around the branch-stage band. */}
           <div
             className="absolute inset-0"
             style={{
               background:
-                "radial-gradient(780px 460px at 50% 780px, rgba(109,61,245,0.10), transparent 68%)," +
-                "radial-gradient(680px 420px at 86% 740px, rgba(139,92,246,0.10), transparent 68%)," +
-                "radial-gradient(560px 340px at 42% 800px, rgba(237,233,254,0.45), transparent 70%)",
+                "radial-gradient(780px 460px at 50% 780px, rgba(37,99,235,0.12), transparent 68%)," +
+                "radial-gradient(680px 420px at 86% 740px, rgba(96,165,250,0.12), transparent 68%)," +
+                "radial-gradient(560px 340px at 42% 800px, rgba(239,246,255,0.74), transparent 70%)",
             }}
           />
-          {/* Fine 64px architectural grid — 1px violet lines at ~3.5%, faded to
+          {/* Fine 64px architectural grid — 1px blue lines at ~3.5%, faded to
               the edges by a radial mask. No diagonals, no per-cell gradient. */}
           <div
             className="absolute inset-0"
             style={{
               backgroundImage:
-                "linear-gradient(to right, rgba(109,61,245,0.035) 1px, transparent 1px)," +
-                "linear-gradient(to bottom, rgba(109,61,245,0.035) 1px, transparent 1px)",
+                "linear-gradient(to right, rgba(37,99,235,0.04) 1px, transparent 1px)," +
+                "linear-gradient(to bottom, rgba(37,99,235,0.04) 1px, transparent 1px)",
               backgroundSize: "64px 64px",
               WebkitMaskImage:
                 "radial-gradient(125% 105% at 50% 38%, #000 45%, transparent 100%)",
@@ -332,7 +341,7 @@ export const BrainExpoLanding = () => {
             className="absolute inset-x-0 top-0 h-[460px]"
             style={{
               background:
-                "radial-gradient(620px 300px at 50% 34%, rgba(250,250,251,0.92), rgba(250,250,251,0) 72%)",
+                "radial-gradient(620px 300px at 50% 34%, rgba(248,250,252,0.94), rgba(248,250,252,0) 72%)",
             }}
           />
         </div>
@@ -344,7 +353,7 @@ export const BrainExpoLanding = () => {
             <HeroHeading word={word} />
 
             <motion.p
-              className="mt-5 mx-auto max-w-xl text-base sm:text-lg text-gray-500 leading-relaxed"
+              className="mt-5 mx-auto max-w-xl text-base sm:text-lg text-[#475569] leading-relaxed"
               variants={v.description}
             >
               Brain Expo captures everything you read, watch and save — then tags,
@@ -390,11 +399,11 @@ export const BrainExpoLanding = () => {
             {heroCards.map((card) => (
               <motion.div
                 key={card.title}
-                className="rounded-xl border border-gray-200 bg-white/95 p-5 shadow-sm"
+                className="rounded-xl border border-[#CBD5E1] bg-white/95 p-5 shadow-[0_1px_2px_rgba(15,23,42,0.04),0_12px_28px_-22px_rgba(37,99,235,0.28)]"
                 variants={v.card}
               >
-                <p className="text-sm font-semibold text-gray-900">{card.title}</p>
-                <p className="text-xs text-gray-500 mt-1 leading-relaxed">{card.text}</p>
+                <p className="text-sm font-semibold text-[#0F172A]">{card.title}</p>
+                <p className="text-xs text-[#475569] mt-1 leading-relaxed">{card.text}</p>
               </motion.div>
             ))}
           </motion.div>
@@ -416,22 +425,24 @@ export const BrainExpoLanding = () => {
       {/* ---------- Integrations (push / pull) ---------- */}
       <section id="integrations" className="max-w-6xl mx-auto px-4 sm:px-6 py-24">
         <div className="text-center max-w-2xl mx-auto mb-14">
-          <h2 className="text-3xl sm:text-4xl font-bold tracking-tight">
+          <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-[#0F172A]">
             Seamless, secure integrations with the tools you use
           </h2>
-          <p className="mt-4 text-gray-500">
+          <p className="mt-4 text-[#475569]">
             Pull your reading in from anywhere, and push what you save back out to
             the apps where you already work.
           </p>
         </div>
 
         {/* Integratin Logo Outer: two stacked marquee rows + divider line */}
-        <div className="flex flex-col items-center gap-0">
+        <div className="relative flex flex-col items-center gap-0">
+          <IntegrationThreadNetwork />
+
           {/* Pushing integrations — Black Logo row */}
-          <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-6">
+          <p className="relative z-[3] text-xs font-semibold uppercase tracking-widest text-[#64748B] mb-6">
             Pushing integrations
           </p>
-          <div className="marquee-pause w-full overflow-hidden">
+          <div className="marquee-pause relative z-[2] w-full overflow-hidden">
             <div className="marquee-track marquee-left" style={{ gap: "56px", padding: "12px 28px" }}>
               {[...integrationLogos, ...integrationLogos, ...integrationLogos].map(({ name, Icon }, i) => (
                 <IntegrationLogo key={`push-${i}`} name={name} Icon={Icon} variant="black" />
@@ -440,17 +451,17 @@ export const BrainExpoLanding = () => {
           </div>
 
           {/* Integration Line divider */}
-          <div className="my-8 h-px w-full max-w-[416px] bg-gradient-to-r from-transparent via-gray-200 to-transparent" />
+          <div className="relative z-[3] my-8 h-px w-full max-w-[416px] bg-gradient-to-r from-transparent via-[#CBD5E1] to-transparent" />
 
           {/* Pulling integrations — White Logo row */}
-          <div className="marquee-pause w-full overflow-hidden">
+          <div className="marquee-pause relative z-[2] w-full overflow-hidden">
             <div className="marquee-track marquee-right" style={{ gap: "56px", padding: "12px 28px" }}>
               {[...integrationLogos, ...integrationLogos, ...integrationLogos].map(({ name, Icon }, i) => (
                 <IntegrationLogo key={`pull-${i}`} name={name} Icon={Icon} variant="white" />
               ))}
             </div>
           </div>
-          <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 mt-6">
+          <p className="relative z-[3] text-xs font-semibold uppercase tracking-widest text-[#64748B] mt-6">
             Pulling integrations
           </p>
         </div>
@@ -463,12 +474,12 @@ export const BrainExpoLanding = () => {
       <ClosingCTA />
 
       {/* ---------- Footer ---------- */}
-      <footer className="bg-[#0f0e14] text-gray-400">
+      <footer className="bg-[#0F172A] text-[#CBD5E1]">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 py-16">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-10">
             <div className="col-span-2 md:col-span-1">
               <div className="flex items-center gap-2.5 text-white">
-                <span style={{ color: ACCENT }}>
+                <span style={{ color: "#60A5FA" }}>
                   <BrainExpoLogo size="lg" />
                 </span>
                 <span className="text-lg font-bold">Brain Expo</span>
@@ -512,7 +523,7 @@ export const BrainExpoLanding = () => {
             nothing is worse than no link. "Inc." also went: nothing establishes
             that the company is incorporated.
           */}
-          <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-white/10 pt-8 md:flex-row">
+          <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-[#CBD5E1]/20 pt-8 md:flex-row">
             <p className="text-xs">© 2026 Brain Expo. All rights reserved.</p>
             <a
               href={`mailto:${SUPPORT_EMAIL}`}
@@ -534,14 +545,20 @@ function HeroActions() {
     <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
       <Link
         to="/sign-up"
-        className="w-full sm:w-auto text-sm font-semibold text-white px-6 py-3 rounded-xl shadow-sm hover:opacity-90 transition-opacity inline-flex items-center justify-center min-h-[48px]"
-        style={{ backgroundColor: ACCENT }}
+        className="w-full sm:w-auto text-sm font-semibold text-white px-6 py-3 rounded-xl shadow-[0_12px_28px_-18px_rgba(37,99,235,0.8)] hover:shadow-[0_16px_34px_-18px_rgba(29,78,216,0.9)] transition-shadow inline-flex items-center justify-center min-h-[48px] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#2563EB]"
+        style={{ background: PRIMARY_GRADIENT }}
+        onMouseEnter={(event) => {
+          event.currentTarget.style.background = PRIMARY_HOVER_GRADIENT;
+        }}
+        onMouseLeave={(event) => {
+          event.currentTarget.style.background = PRIMARY_GRADIENT;
+        }}
       >
         Start for free
       </Link>
       <a
         href="#products"
-        className="w-full sm:w-auto text-sm font-semibold text-gray-700 px-6 py-3 rounded-xl border border-gray-200 bg-white/90 backdrop-blur hover:bg-white transition-colors inline-flex items-center justify-center min-h-[48px]"
+        className="w-full sm:w-auto text-sm font-semibold text-[#475569] px-6 py-3 rounded-xl border border-[#CBD5E1] bg-white/90 backdrop-blur hover:border-[#94A3B8] hover:bg-white hover:text-[#0F172A] transition-colors inline-flex items-center justify-center min-h-[48px] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#2563EB]"
       >
         See how it works
       </a>
@@ -569,9 +586,9 @@ function HeroHeading({ word }: { word: string }) {
     <div className="relative z-10 mt-27">
       <motion.div
         className="inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium shadow-sm"
-        style={{ borderColor: "rgba(119,76,255,0.25)", color: ACCENT, backgroundColor: "rgba(119,76,255,0.06)" }}
+        style={{ borderColor: "rgba(119,76,255,0.25)", color: HERO_HEADER_ACCENT, backgroundColor: "rgba(119,76,255,0.06)" }}
       >
-        <span className="inline-block w-1.5 h-1.5 rounded-full" style={{ backgroundColor: ACCENT }} />
+        <span className="inline-block w-1.5 h-1.5 rounded-full" style={{ backgroundColor: HERO_HEADER_ACCENT }} />
         Your second brain for the modern web
       </motion.div>
       <h1
@@ -692,9 +709,9 @@ function HeroThreads() {
     >
       <defs>
         <linearGradient id="wireGrad" x1="0" y1="0" x2="1" y2="0">
-          <stop offset="0%" stopColor="#774CFF" stopOpacity="0.1" />
-          <stop offset="50%" stopColor="#774CFF" stopOpacity="0.5" />
-          <stop offset="100%" stopColor="#774CFF" stopOpacity="0.1" />
+          <stop offset="0%" stopColor="#2563EB" stopOpacity="0.1" />
+          <stop offset="50%" stopColor="#3B82F6" stopOpacity="0.5" />
+          <stop offset="100%" stopColor="#60A5FA" stopOpacity="0.1" />
         </linearGradient>
       </defs>
 
@@ -716,14 +733,14 @@ function HeroThreads() {
           {/* animated flow overlay */}
           <path
             d={n.path}
-            stroke="#774CFF"
+            stroke={LANDING_ACCENT}
             strokeWidth={1.4}
             strokeOpacity={0.45}
             strokeDasharray="4 14"
             className="wire-flow"
           />
           {/* branch root dot on the orb rim */}
-          <circle cx={n.origin[0]} cy={n.origin[1]} r={4} fill="#ffffff" stroke="#774CFF" strokeWidth={1.4} />
+          <circle cx={n.origin[0]} cy={n.origin[1]} r={4} fill="#ffffff" stroke={LANDING_ACCENT} strokeWidth={1.4} />
         </g>
       ))}
     </svg>
@@ -759,13 +776,13 @@ function HeroHub({ v, word }: { v: LandingVariants; word: string }) {
         <motion.div className="relative" variants={v.secondary(0.85)}>
           <div
             className="orb-glow absolute -inset-10 rounded-full"
-            style={{ background: "radial-gradient(closest-side, rgba(119,76,255,0.55), transparent)" }}
+            style={{ background: "radial-gradient(closest-side, rgba(37,99,235,0.48), transparent)" }}
           />
           <div
             className="relative flex h-24 w-24 items-center justify-center rounded-full sm:h-28 sm:w-28"
             style={{
-              background: "radial-gradient(circle at 32% 28%, #8a6bff, #1b1b22 78%)",
-              boxShadow: "0 20px 55px rgba(119,76,255,0.5), inset 0 0 20px rgba(255,255,255,0.15)",
+              background: "radial-gradient(circle at 32% 28%, #60A5FA, #0F172A 78%)",
+              boxShadow: "0 20px 55px rgba(37,99,235,0.45), inset 0 0 20px rgba(255,255,255,0.15)",
             }}
           >
             <span className="text-white">
@@ -786,16 +803,16 @@ function HeroHub({ v, word }: { v: LandingVariants; word: string }) {
 function HubTag({ word }: { word: string }) {
   const reduce = useReducedMotion() ?? false;
   return (
-    <div className="flex items-center gap-2 whitespace-nowrap rounded-full bg-white px-3.5 py-1.5 shadow-[0_12px_32px_-8px_rgba(80,50,180,0.5)] ring-1 ring-black/5">
+    <div className="flex items-center gap-2 whitespace-nowrap rounded-full bg-white px-3.5 py-1.5 shadow-[0_12px_32px_-8px_rgba(37,99,235,0.35)] ring-1 ring-[#CBD5E1]">
       <span className="relative flex h-2 w-2">
         <span
           className="absolute inline-flex h-full w-full rounded-full opacity-60"
-          style={{ backgroundColor: ACCENT, animation: reduce ? undefined : "orbPulse 2s ease-in-out infinite" }}
+          style={{ backgroundColor: LANDING_ACCENT, animation: reduce ? undefined : "orbPulse 2s ease-in-out infinite" }}
         />
-        <span className="relative inline-flex h-2 w-2 rounded-full" style={{ backgroundColor: ACCENT }} />
+        <span className="relative inline-flex h-2 w-2 rounded-full" style={{ backgroundColor: LANDING_ACCENT }} />
       </span>
-      <span className="text-xs font-medium text-gray-500">Knowledge, made</span>
-      <span className="grid text-xs font-semibold" style={{ color: ACCENT }}>
+      <span className="text-xs font-medium text-[#64748B]">Knowledge, made</span>
+      <span className="grid text-xs font-semibold" style={{ color: LANDING_ACCENT }}>
         <AnimatePresence initial={false}>
           <motion.span
             key={word}
@@ -834,14 +851,14 @@ function HeroFloatingNodes({ v }: { v: LandingVariants }) {
               className="hero-float"
               style={{ animationDuration: `${n.floatDur}s`, animationDelay: `${n.floatDelay}s` }}
             >
-              <div className="flex items-center gap-2.5 rounded-2xl bg-white/95 backdrop-blur px-3.5 py-2.5 shadow-[0_18px_45px_-12px_rgba(80,50,180,0.4)] ring-1 ring-black/5">
+              <div className="flex items-center gap-2.5 rounded-2xl bg-white/95 backdrop-blur px-3.5 py-2.5 shadow-[0_18px_45px_-16px_rgba(37,99,235,0.28)] ring-1 ring-[#CBD5E1]">
                 <span
                   className="flex h-9 w-9 items-center justify-center rounded-xl"
                   style={{ backgroundColor: `${n.color}14` }}
                 >
                   <n.Icon className="h-5 w-5" style={{ color: n.color }} />
                 </span>
-                <span className="text-xs font-semibold text-gray-700 whitespace-nowrap">{n.name}</span>
+                <span className="text-xs font-semibold text-[#475569] whitespace-nowrap">{n.name}</span>
               </div>
             </div>
           </motion.div>
@@ -875,9 +892,9 @@ function IntegrationLogo({
       style={{
         borderRadius: "22.8px",
         padding: "5px",
-        border: black ? "2px solid rgba(255,255,255,0.1)" : "2px solid rgba(0,0,0,0.06)",
-        background: black ? "#1b1b22" : "#ffffff",
-        boxShadow: "0px 25px 40px -6.4px rgba(0,0,0,0.2)",
+        border: black ? "2px solid rgba(248,250,252,0.12)" : "2px solid #CBD5E1",
+        background: black ? "#0F172A" : "#ffffff",
+        boxShadow: "0px 25px 40px -6.4px rgba(15,23,42,0.18)",
       }}
     >
       {/* Integration Logo Inner */}
@@ -888,12 +905,138 @@ function IntegrationLogo({
           height: "81px",
           borderRadius: "20px",
           padding: "16px",
-          background: black ? "rgba(233,233,233,0.12)" : "rgba(0,0,0,0.04)",
+          background: black ? "rgba(248,250,252,0.12)" : "#EFF6FF",
         }}
       >
-        <Icon className={`w-8 h-8 ${black ? "text-white" : "text-[#1b1b22]"}`} />
+        <Icon className={`w-8 h-8 ${black ? "text-white" : "text-[#2563EB]"}`} />
       </div>
     </div>
+  );
+}
+
+const INTEGRATION_IN_PATHS = [
+  { d: "M -40 36 C 112 38, 214 72, 328 118 C 390 143, 448 140, 506 129", delay: 0 },
+  { d: "M 132 28 C 238 44, 302 80, 382 112 C 432 132, 482 134, 535 128", delay: 0.08 },
+  { d: "M 292 30 C 358 48, 394 88, 456 118 C 492 136, 532 136, 574 130", delay: 0.14, accent: true },
+  { d: "M 468 26 C 506 60, 526 92, 566 119 C 588 134, 611 137, 638 132", delay: 0.2 },
+  { d: "M 602 28 C 592 66, 604 98, 636 126 C 658 145, 682 146, 710 133", delay: 0.26 },
+  { d: "M 744 30 C 692 54, 678 92, 704 119 C 728 144, 764 145, 810 127", delay: 0.32, accent: true },
+  { d: "M 916 28 C 828 42, 772 78, 735 112 C 708 137, 676 141, 639 130", delay: 0.4 },
+  { d: "M 1240 36 C 1088 38, 986 72, 872 118 C 812 142, 754 139, 696 128", delay: 0.48 },
+];
+
+const INTEGRATION_OUT_PATHS = [
+  { d: "M 506 129 C 438 154, 370 184, 292 224 C 220 260, 92 260, -44 226", delay: 0.64 },
+  { d: "M 535 128 C 478 154, 420 184, 356 230 C 304 267, 224 270, 140 236", delay: 0.7, accent: true },
+  { d: "M 574 130 C 520 158, 492 190, 464 232 C 432 280, 376 280, 292 236", delay: 0.76 },
+  { d: "M 638 132 C 610 164, 598 196, 604 236", delay: 0.82 },
+  { d: "M 710 133 C 742 160, 748 196, 740 236", delay: 0.9 },
+  { d: "M 810 127 C 754 156, 786 190, 846 230 C 900 266, 982 270, 1062 236", delay: 0.98 },
+  { d: "M 696 128 C 766 154, 838 184, 914 224 C 988 262, 1112 260, 1244 226", delay: 1.06, accent: true },
+  { d: "M 639 130 C 686 166, 712 204, 804 236", delay: 1.14 },
+];
+
+const INTEGRATION_JUNCTIONS = [
+  { cx: 506, cy: 129, r: 1.8, delay: 0.55 },
+  { cx: 574, cy: 130, r: 2.1, delay: 0.66 },
+  { cx: 638, cy: 132, r: 2.4, delay: 0.75 },
+  { cx: 710, cy: 133, r: 2, delay: 0.84 },
+  { cx: 810, cy: 127, r: 1.8, delay: 0.92 },
+];
+
+function IntegrationThreadNetwork() {
+  const reduce = useReducedMotion() ?? false;
+  const pathTransition = (delay: number) => ({
+    pathLength: { duration: reduce ? 0.01 : 1.4, ease: [0.22, 1, 0.36, 1] as const, delay },
+    opacity: { duration: reduce ? 0.01 : 0.4, delay },
+  });
+
+  return (
+    <motion.svg
+      viewBox="0 0 1200 260"
+      preserveAspectRatio="none"
+      className="pointer-events-none absolute -inset-x-24 top-[68px] z-0 h-[260px] overflow-visible sm:-inset-x-32 lg:-inset-x-44"
+      aria-hidden
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true, amount: 0.25 }}
+    >
+      <defs>
+        <linearGradient id="integrationThreadFade" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stopColor="#CBD5E1" stopOpacity="0" />
+          <stop offset="16%" stopColor="#CBD5E1" stopOpacity="0.3" />
+          <stop offset="84%" stopColor="#CBD5E1" stopOpacity="0.3" />
+          <stop offset="100%" stopColor="#CBD5E1" stopOpacity="0" />
+        </linearGradient>
+        <linearGradient id="integrationAccentFade" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stopColor="#7EA5F8" stopOpacity="0" />
+          <stop offset="18%" stopColor="#7EA5F8" stopOpacity="0.45" />
+          <stop offset="82%" stopColor="#7EA5F8" stopOpacity="0.45" />
+          <stop offset="100%" stopColor="#7EA5F8" stopOpacity="0" />
+        </linearGradient>
+        <filter id="integrationThreadGlow" x="-12%" y="-28%" width="124%" height="156%">
+          <feDropShadow dx="0" dy="0" stdDeviation="2.5" floodColor="rgb(90, 140, 245)" floodOpacity="0.15" />
+        </filter>
+      </defs>
+
+      {[...INTEGRATION_IN_PATHS, ...INTEGRATION_OUT_PATHS].map((path, index) => (
+        <motion.path
+          key={`${path.d}-${index}`}
+          d={path.d}
+          fill="none"
+          stroke={path.accent ? "url(#integrationAccentFade)" : "url(#integrationThreadFade)"}
+          strokeWidth={path.accent ? 1.25 : 1}
+          strokeLinecap="round"
+          opacity={path.accent ? 0.45 : 0.3}
+          filter={path.accent ? "url(#integrationThreadGlow)" : undefined}
+          variants={{
+            hidden: { pathLength: 0, opacity: 0 },
+            visible: { pathLength: 1, opacity: path.accent ? 0.45 : 0.3 },
+          }}
+          transition={pathTransition(path.delay)}
+        />
+      ))}
+
+      {!reduce &&
+        [
+          { d: "M 292 30 C 358 48, 394 88, 456 118 C 492 136, 532 136, 574 130 C 520 158, 492 190, 464 232 C 432 280, 376 280, 292 236", delay: 1.85 },
+          { d: "M 744 30 C 692 54, 678 92, 704 119 C 728 144, 764 145, 810 127 C 754 156, 786 190, 846 230 C 900 266, 982 270, 1062 236", delay: 2.12 },
+        ].map((pulse, index) => (
+          <motion.path
+            key={`pulse-${index}`}
+            d={pulse.d}
+            fill="none"
+            stroke="#7EA5F8"
+            strokeWidth="1.25"
+            strokeLinecap="round"
+            strokeDasharray="12 520"
+            opacity="0"
+            filter="url(#integrationThreadGlow)"
+            initial={{ strokeDashoffset: 260, opacity: 0 }}
+            whileInView={{ strokeDashoffset: -260, opacity: [0, 0.42, 0] }}
+            viewport={{ once: true, amount: 0.25 }}
+            transition={{ duration: 1.9, delay: pulse.delay, ease: [0.22, 1, 0.36, 1] as const }}
+          />
+        ))}
+
+      {INTEGRATION_JUNCTIONS.map((node) => (
+        <motion.circle
+          key={`${node.cx}-${node.cy}`}
+          cx={node.cx}
+          cy={node.cy}
+          r={node.r}
+          fill="#8FB0F7"
+          variants={{
+            hidden: { opacity: 0, r: 0 },
+            visible: { opacity: 0.5, r: node.r },
+          }}
+          transition={{
+            opacity: { duration: reduce ? 0.01 : 0.45, delay: node.delay },
+            r: { duration: reduce ? 0.01 : 0.45, delay: node.delay, ease: [0.22, 1, 0.36, 1] as const },
+          }}
+        />
+      ))}
+    </motion.svg>
   );
 }
 

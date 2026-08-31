@@ -13,7 +13,7 @@ import {
  *
  * These are not decorative mock-ups: the digest reproduces what
  * `brainly-backend/src/emails/weeklyDigest.ts` actually sends (its headings, its
- * stat tiles, its recall block, its literal palette), and the share panel
+ * stat tiles, its recall block), and the share panel
  * reproduces `shareModal.tsx` (its four scopes, its copy, its helper line). The
  * tour is allowed to say only things the product already does.
  *
@@ -31,28 +31,30 @@ import {
 /** Literal light-theme values matching the app's semantic tokens. */
 const T = {
   card: "#FFFFFF",
-  surface: "#FAFAF9",
-  line: "#E7E5E4",
-  fg: "#12110F",
-  fgMuted: "#57534E",
-  fgSubtle: "#A8A29E",
-  brand: "#774CFF",
-  tag: "#EDE9FE",
-  tagFg: "#5B45D6",
+  surface: "#F8FAFC",
+  line: "#CBD5E1",
+  fg: "#0F172A",
+  fgMuted: "#475569",
+  fgSubtle: "#64748B",
+  brand: "#2563EB",
+  tag: "#EFF6FF",
+  tagFg: "#2563EB",
 } as const;
 
-/** The digest's own palette, copied from the email layout module. */
+const PRIMARY_GRADIENT = "linear-gradient(90deg, #2563EB 0%, #3B82F6 55%, #60A5FA 100%)";
+
+/** The digest keeps the real content while adopting this landing palette. */
 const E = {
-  pageBg: "#F4F4F5",
-  tileBg: "#FAFAFA",
-  border: "#E4E4E7",
-  textPrimary: "#18181B",
-  textSecondary: "#52525B",
-  textMuted: "#A1A1AA",
-  cta: "#8C21F1",
-  recallBg: "#EEEDFE",
-  recallLabel: "#3C3489",
-  recallText: "#26215C",
+  pageBg: "#F8FAFC",
+  tileBg: "#FFFFFF",
+  border: "#CBD5E1",
+  textPrimary: "#0F172A",
+  textSecondary: "#475569",
+  textMuted: "#64748B",
+  cta: "#2563EB",
+  recallBg: "#EFF6FF",
+  recallLabel: "#2563EB",
+  recallText: "#0F172A",
 } as const;
 
 const TYPE_DOT = {
@@ -95,8 +97,8 @@ function Panel({
         border: `1px solid ${T.line}`,
         boxShadow:
           elevation === 2
-            ? "0 2px 4px rgba(16,12,40,0.04), 0 28px 60px -28px rgba(16,12,40,0.42)"
-            : "0 1px 2px rgba(16,12,40,0.04), 0 18px 44px -24px rgba(16,12,40,0.28)",
+            ? "0 2px 4px rgba(15,23,42,0.04), 0 28px 60px -28px rgba(37,99,235,0.34)"
+            : "0 1px 2px rgba(15,23,42,0.04), 0 18px 44px -24px rgba(15,23,42,0.18)",
         ...style,
       }}
     >
@@ -353,7 +355,7 @@ export function DigestScene() {
                 height: 16,
                 borderRadius: 16,
                 background: "#FFFFFF",
-                boxShadow: "0 1px 2px rgba(16,12,40,0.3)",
+                boxShadow: "0 1px 2px rgba(15,23,42,0.3)",
               }}
             />
           </span>
@@ -531,7 +533,7 @@ export function RevisitScene() {
                 fontSize: 10.5,
                 fontWeight: 600,
                 color: "#7C3AED",
-                boxShadow: "0 1px 2px rgba(16,12,40,0.08)",
+                boxShadow: "0 1px 2px rgba(15,23,42,0.08)",
               }}
             >
               <span style={{ width: 6, height: 6, borderRadius: 6, background: "#7C3AED" }} />
@@ -638,7 +640,7 @@ export function ShareScene() {
                 borderRadius: 10,
                 textAlign: "left",
                 border: selected ? `1px solid ${T.brand}` : `1px solid ${T.line}`,
-                background: selected ? "rgba(119,76,255,0.06)" : T.card,
+                background: selected ? "#EFF6FF" : T.card,
               }}
             >
               <span style={{ display: "block", fontSize: 12.5, fontWeight: 600, color: T.fg }}>
@@ -689,7 +691,7 @@ export function ShareScene() {
             gap: 6,
             padding: "7px 12px",
             borderRadius: 8,
-            background: T.brand,
+            background: PRIMARY_GRADIENT,
             color: "#FFFFFF",
             fontSize: 12,
             fontWeight: 600,

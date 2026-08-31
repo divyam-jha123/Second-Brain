@@ -21,7 +21,7 @@ import {
  * button's rect is measured on enter rather than on every move.
  */
 
-const ACCENT = "#774CFF";
+const PRIMARY_GRADIENT = "linear-gradient(90deg, #2563EB 0%, #3B82F6 55%, #60A5FA 100%)";
 const EASE = [0.22, 1, 0.36, 1] as const;
 /** How far the button is allowed to follow the cursor, as a fraction of offset. */
 const PULL = 0.22;
@@ -58,13 +58,13 @@ export function ClosingCTA() {
         className="pointer-events-none absolute inset-0"
         style={{
           background:
-            "radial-gradient(80% 60% at 50% 100%, rgba(119,76,255,0.14) 0%, rgba(119,76,255,0.04) 45%, transparent 72%)",
+            "radial-gradient(80% 60% at 50% 100%, rgba(37,99,235,0.14) 0%, rgba(96,165,250,0.06) 45%, transparent 72%)",
         }}
       />
 
       <div className="relative mx-auto max-w-3xl text-center">
         <motion.h2
-          className="font-hero mx-auto max-w-[18ch] text-[30px] leading-[1.12] font-bold tracking-tight text-balance text-gray-900 sm:text-[40px]"
+          className="font-hero mx-auto max-w-[18ch] text-[30px] leading-[1.12] font-bold tracking-tight text-balance text-[#0F172A] sm:text-[40px]"
           variants={line}
           initial="hidden"
           whileInView="visible"
@@ -82,7 +82,7 @@ export function ClosingCTA() {
         </motion.h2>
 
         <motion.p
-          className="mt-5 text-gray-500"
+          className="mt-5 text-[#475569]"
           initial={reduce ? false : { opacity: 0, y: 8 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.6 }}
@@ -137,8 +137,8 @@ function MagneticCTA({ reduce }: { reduce: boolean }) {
     >
       <Link
         to="/sign-up"
-        className="relative inline-flex min-h-[52px] items-center justify-center overflow-hidden rounded-xl px-9 text-sm font-semibold text-white shadow-[0_2px_6px_rgba(16,12,40,0.12),0_18px_36px_-18px_rgba(119,76,255,0.7)] transition-shadow duration-300 group-hover:shadow-[0_2px_8px_rgba(16,12,40,0.16),0_26px_50px_-20px_rgba(119,76,255,0.85)] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#774CFF]"
-        style={{ backgroundColor: ACCENT }}
+        className="relative inline-flex min-h-[52px] items-center justify-center overflow-hidden rounded-xl px-9 text-sm font-semibold text-white shadow-[0_2px_6px_rgba(15,23,42,0.12),0_18px_36px_-18px_rgba(37,99,235,0.7)] transition-shadow duration-300 group-hover:shadow-[0_2px_8px_rgba(15,23,42,0.16),0_26px_50px_-20px_rgba(37,99,235,0.85)] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#2563EB]"
+        style={{ background: PRIMARY_GRADIENT }}
       >
         {/* Highlight that rides along with the cursor. */}
         <span
