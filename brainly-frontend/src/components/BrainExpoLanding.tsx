@@ -16,6 +16,7 @@ import { FeaturesScrollytelling } from "./landing/FeaturesScrollytelling";
 import { ProductStatement } from "./landing/ProductStatement";
 import { FeatureSwitcher } from "./landing/FeatureSwitcher";
 import { ServiceCards } from "./landing/ServiceCards";
+import { IntegrationFlow } from "./landing/IntegrationFlow";
 import { SecurityBand } from "./landing/SecurityBand";
 import { ClosingCTA } from "./landing/ClosingCTA";
 
@@ -29,6 +30,10 @@ import { ClosingCTA } from "./landing/ClosingCTA";
  */
 
 const HERO_HEADER_ACCENT = "#774CFF";
+// The Brain Expo mark is the same colour here as in the app: --brand, light
+// (#774CFF) on the light header, and the dark-theme value on the dark footer.
+const BRAND_MARK = "#774CFF";
+const BRAND_MARK_ON_DARK = "#8F6CFF";
 const LANDING_ACCENT = "#2563EB";
 const PRIMARY_GRADIENT = "linear-gradient(90deg, #2563EB 0%, #3B82F6 55%, #60A5FA 100%)";
 const PRIMARY_HOVER_GRADIENT = "linear-gradient(90deg, #1D4ED8 0%, #2563EB 55%, #3B82F6 100%)";
@@ -143,16 +148,6 @@ const heroNodes: {
     path: "M 645 332 C 780 400, 950 470, 1116 504", origin: [645, 332], thread: 1.2, entrance: 1.5, floatDur: 7.3, floatDelay: 1.4 },
 ];
 
-// The six source logos, matching the Framer template's Integration Logo row.
-const integrationLogos: { name: string; Icon: React.ComponentType<{ className?: string }> }[] = [
-  { name: "YouTube", Icon: FaYoutube },
-  { name: "LinkedIn", Icon: FaLinkedin },
-  { name: "Document", Icon: FaFileLines },
-  { name: "Twitter", Icon: FaXTwitter },
-  { name: "Link", Icon: FaLink },
-  { name: "Video", Icon: FaVideo },
-];
-
 export const BrainExpoLanding = () => {
   const [isNavOpen, setIsNavOpen] = useState(false);
   const v = useLandingVariants();
@@ -208,7 +203,7 @@ export const BrainExpoLanding = () => {
             }}
           >
             <div className="flex items-center gap-2.5">
-              <span style={{ color: LANDING_ACCENT }}>
+              <span style={{ color: BRAND_MARK }}>
                 <BrainExpoLogo size="lg" />
               </span>
               <span className="text-xl font-bold tracking-tight text-[#0F172A]">Brain Expo</span>
@@ -422,50 +417,8 @@ export const BrainExpoLanding = () => {
       {/* ---------- The five tools ---------- */}
       <ServiceCards />
 
-      {/* ---------- Integrations (push / pull) ---------- */}
-      <section id="integrations" className="max-w-6xl mx-auto px-4 sm:px-6 py-24">
-        <div className="text-center max-w-2xl mx-auto mb-14">
-          <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-[#0F172A]">
-            Seamless, secure integrations with the tools you use
-          </h2>
-          <p className="mt-4 text-[#475569]">
-            Pull your reading in from anywhere, and push what you save back out to
-            the apps where you already work.
-          </p>
-        </div>
-
-        {/* Integratin Logo Outer: two stacked marquee rows + divider line */}
-        <div className="relative flex flex-col items-center gap-0">
-          <IntegrationThreadNetwork />
-
-          {/* Pushing integrations — Black Logo row */}
-          <p className="relative z-[3] text-xs font-semibold uppercase tracking-widest text-[#64748B] mb-6">
-            Pushing integrations
-          </p>
-          <div className="marquee-pause relative z-[2] w-full overflow-hidden">
-            <div className="marquee-track marquee-left" style={{ gap: "56px", padding: "12px 28px" }}>
-              {[...integrationLogos, ...integrationLogos, ...integrationLogos].map(({ name, Icon }, i) => (
-                <IntegrationLogo key={`push-${i}`} name={name} Icon={Icon} variant="black" />
-              ))}
-            </div>
-          </div>
-
-          {/* Integration Line divider */}
-          <div className="relative z-[3] my-8 h-px w-full max-w-[416px] bg-gradient-to-r from-transparent via-[#CBD5E1] to-transparent" />
-
-          {/* Pulling integrations — White Logo row */}
-          <div className="marquee-pause relative z-[2] w-full overflow-hidden">
-            <div className="marquee-track marquee-right" style={{ gap: "56px", padding: "12px 28px" }}>
-              {[...integrationLogos, ...integrationLogos, ...integrationLogos].map(({ name, Icon }, i) => (
-                <IntegrationLogo key={`pull-${i}`} name={name} Icon={Icon} variant="white" />
-              ))}
-            </div>
-          </div>
-          <p className="relative z-[3] text-xs font-semibold uppercase tracking-widest text-[#64748B] mt-6">
-            Pulling integrations
-          </p>
-        </div>
-      </section>
+      {/* ---------- Integrations (pull -> hub -> push) ---------- */}
+      <IntegrationFlow />
 
       {/* ---------- Security (revocable-link demo) ---------- */}
       <SecurityBand />
@@ -479,7 +432,7 @@ export const BrainExpoLanding = () => {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-10">
             <div className="col-span-2 md:col-span-1">
               <div className="flex items-center gap-2.5 text-white">
-                <span style={{ color: "#60A5FA" }}>
+                <span style={{ color: BRAND_MARK_ON_DARK }}>
                   <BrainExpoLogo size="lg" />
                 </span>
                 <span className="text-lg font-bold">Brain Expo</span>
@@ -865,178 +818,6 @@ function HeroFloatingNodes({ v }: { v: LandingVariants }) {
         </div>
       ))}
     </div>
-  );
-}
-
-/**
- * Single logo card — mirrors the Framer "Integration Logo" node thread:
- *   Outer card (radius 22.8px, 2px border, drop-shadow, 5px padding)
- *     -> Inner tinted square (68x81, radius 20px, 16px padding, translucent fill)
- *       -> logo (max ~43px wide)
- * "black" is the Pushing row, "white" is the Pulling row.
- */
-function IntegrationLogo({
-  name,
-  Icon,
-  variant,
-}: {
-  name: string;
-  Icon: React.ComponentType<{ className?: string }>;
-  variant: "black" | "white";
-}) {
-  const black = variant === "black";
-  return (
-    <div
-      title={name}
-      className="shrink-0"
-      style={{
-        borderRadius: "22.8px",
-        padding: "5px",
-        border: black ? "2px solid rgba(248,250,252,0.12)" : "2px solid #CBD5E1",
-        background: black ? "#0F172A" : "#ffffff",
-        boxShadow: "0px 25px 40px -6.4px rgba(15,23,42,0.18)",
-      }}
-    >
-      {/* Integration Logo Inner */}
-      <div
-        className="flex items-center justify-center"
-        style={{
-          width: "68px",
-          height: "81px",
-          borderRadius: "20px",
-          padding: "16px",
-          background: black ? "rgba(248,250,252,0.12)" : "#EFF6FF",
-        }}
-      >
-        <Icon className={`w-8 h-8 ${black ? "text-white" : "text-[#2563EB]"}`} />
-      </div>
-    </div>
-  );
-}
-
-const INTEGRATION_IN_PATHS = [
-  { d: "M -40 36 C 112 38, 214 72, 328 118 C 390 143, 448 140, 506 129", delay: 0 },
-  { d: "M 132 28 C 238 44, 302 80, 382 112 C 432 132, 482 134, 535 128", delay: 0.08 },
-  { d: "M 292 30 C 358 48, 394 88, 456 118 C 492 136, 532 136, 574 130", delay: 0.14, accent: true },
-  { d: "M 468 26 C 506 60, 526 92, 566 119 C 588 134, 611 137, 638 132", delay: 0.2 },
-  { d: "M 602 28 C 592 66, 604 98, 636 126 C 658 145, 682 146, 710 133", delay: 0.26 },
-  { d: "M 744 30 C 692 54, 678 92, 704 119 C 728 144, 764 145, 810 127", delay: 0.32, accent: true },
-  { d: "M 916 28 C 828 42, 772 78, 735 112 C 708 137, 676 141, 639 130", delay: 0.4 },
-  { d: "M 1240 36 C 1088 38, 986 72, 872 118 C 812 142, 754 139, 696 128", delay: 0.48 },
-];
-
-const INTEGRATION_OUT_PATHS = [
-  { d: "M 506 129 C 438 154, 370 184, 292 224 C 220 260, 92 260, -44 226", delay: 0.64 },
-  { d: "M 535 128 C 478 154, 420 184, 356 230 C 304 267, 224 270, 140 236", delay: 0.7, accent: true },
-  { d: "M 574 130 C 520 158, 492 190, 464 232 C 432 280, 376 280, 292 236", delay: 0.76 },
-  { d: "M 638 132 C 610 164, 598 196, 604 236", delay: 0.82 },
-  { d: "M 710 133 C 742 160, 748 196, 740 236", delay: 0.9 },
-  { d: "M 810 127 C 754 156, 786 190, 846 230 C 900 266, 982 270, 1062 236", delay: 0.98 },
-  { d: "M 696 128 C 766 154, 838 184, 914 224 C 988 262, 1112 260, 1244 226", delay: 1.06, accent: true },
-  { d: "M 639 130 C 686 166, 712 204, 804 236", delay: 1.14 },
-];
-
-const INTEGRATION_JUNCTIONS = [
-  { cx: 506, cy: 129, r: 1.8, delay: 0.55 },
-  { cx: 574, cy: 130, r: 2.1, delay: 0.66 },
-  { cx: 638, cy: 132, r: 2.4, delay: 0.75 },
-  { cx: 710, cy: 133, r: 2, delay: 0.84 },
-  { cx: 810, cy: 127, r: 1.8, delay: 0.92 },
-];
-
-function IntegrationThreadNetwork() {
-  const reduce = useReducedMotion() ?? false;
-  const pathTransition = (delay: number) => ({
-    pathLength: { duration: reduce ? 0.01 : 1.4, ease: [0.22, 1, 0.36, 1] as const, delay },
-    opacity: { duration: reduce ? 0.01 : 0.4, delay },
-  });
-
-  return (
-    <motion.svg
-      viewBox="0 0 1200 260"
-      preserveAspectRatio="none"
-      className="pointer-events-none absolute -inset-x-24 top-[68px] z-0 h-[260px] overflow-visible sm:-inset-x-32 lg:-inset-x-44"
-      aria-hidden
-      initial="hidden"
-      whileInView="visible"
-      viewport={{ once: true, amount: 0.25 }}
-    >
-      <defs>
-        <linearGradient id="integrationThreadFade" x1="0" y1="0" x2="1" y2="0">
-          <stop offset="0%" stopColor="#CBD5E1" stopOpacity="0" />
-          <stop offset="16%" stopColor="#CBD5E1" stopOpacity="0.3" />
-          <stop offset="84%" stopColor="#CBD5E1" stopOpacity="0.3" />
-          <stop offset="100%" stopColor="#CBD5E1" stopOpacity="0" />
-        </linearGradient>
-        <linearGradient id="integrationAccentFade" x1="0" y1="0" x2="1" y2="0">
-          <stop offset="0%" stopColor="#7EA5F8" stopOpacity="0" />
-          <stop offset="18%" stopColor="#7EA5F8" stopOpacity="0.45" />
-          <stop offset="82%" stopColor="#7EA5F8" stopOpacity="0.45" />
-          <stop offset="100%" stopColor="#7EA5F8" stopOpacity="0" />
-        </linearGradient>
-        <filter id="integrationThreadGlow" x="-12%" y="-28%" width="124%" height="156%">
-          <feDropShadow dx="0" dy="0" stdDeviation="2.5" floodColor="rgb(90, 140, 245)" floodOpacity="0.15" />
-        </filter>
-      </defs>
-
-      {[...INTEGRATION_IN_PATHS, ...INTEGRATION_OUT_PATHS].map((path, index) => (
-        <motion.path
-          key={`${path.d}-${index}`}
-          d={path.d}
-          fill="none"
-          stroke={path.accent ? "url(#integrationAccentFade)" : "url(#integrationThreadFade)"}
-          strokeWidth={path.accent ? 1.25 : 1}
-          strokeLinecap="round"
-          opacity={path.accent ? 0.45 : 0.3}
-          filter={path.accent ? "url(#integrationThreadGlow)" : undefined}
-          variants={{
-            hidden: { pathLength: 0, opacity: 0 },
-            visible: { pathLength: 1, opacity: path.accent ? 0.45 : 0.3 },
-          }}
-          transition={pathTransition(path.delay)}
-        />
-      ))}
-
-      {!reduce &&
-        [
-          { d: "M 292 30 C 358 48, 394 88, 456 118 C 492 136, 532 136, 574 130 C 520 158, 492 190, 464 232 C 432 280, 376 280, 292 236", delay: 1.85 },
-          { d: "M 744 30 C 692 54, 678 92, 704 119 C 728 144, 764 145, 810 127 C 754 156, 786 190, 846 230 C 900 266, 982 270, 1062 236", delay: 2.12 },
-        ].map((pulse, index) => (
-          <motion.path
-            key={`pulse-${index}`}
-            d={pulse.d}
-            fill="none"
-            stroke="#7EA5F8"
-            strokeWidth="1.25"
-            strokeLinecap="round"
-            strokeDasharray="12 520"
-            opacity="0"
-            filter="url(#integrationThreadGlow)"
-            initial={{ strokeDashoffset: 260, opacity: 0 }}
-            whileInView={{ strokeDashoffset: -260, opacity: [0, 0.42, 0] }}
-            viewport={{ once: true, amount: 0.25 }}
-            transition={{ duration: 1.9, delay: pulse.delay, ease: [0.22, 1, 0.36, 1] as const }}
-          />
-        ))}
-
-      {INTEGRATION_JUNCTIONS.map((node) => (
-        <motion.circle
-          key={`${node.cx}-${node.cy}`}
-          cx={node.cx}
-          cy={node.cy}
-          r={node.r}
-          fill="#8FB0F7"
-          variants={{
-            hidden: { opacity: 0, r: 0 },
-            visible: { opacity: 0.5, r: node.r },
-          }}
-          transition={{
-            opacity: { duration: reduce ? 0.01 : 0.45, delay: node.delay },
-            r: { duration: reduce ? 0.01 : 0.45, delay: node.delay, ease: [0.22, 1, 0.36, 1] as const },
-          }}
-        />
-      ))}
-    </motion.svg>
   );
 }
 
