@@ -46,6 +46,15 @@ export function createApp() {
   //     allowedHeaders: ["Content-Type", "Authorization"],
   //   }),
   // );
+  // Liveness probe for the landing-page warm-up ping. Mounted before Clerk so
+  // it needs no token, and it touches no database — the point is only to get
+  // the sleeping instance booted, not to report on its dependencies.
+  app.get("/health", (_req, res) => {
+    console.log("Health check");
+    console.log("API is warmed up!");
+    res.status(200).json({ ok: true });
+  });
+
   app.use(clerkMiddleware());
 
   app.use("/user", userRouter);
