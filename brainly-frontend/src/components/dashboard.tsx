@@ -19,6 +19,7 @@ import { CreateModal } from "../components/createModal";
 import { ShareModal } from "../components/shareModal";
 import { ExtensionBanner } from "./ExtensionBanner";
 import { OnboardingModal } from "./OnboardingModal";
+import { NotesSkeleton } from "./skeletons";
 import { useEmailSync } from "../hooks/useEmailSync";
 import { useOnboardingStatus } from "../hooks/useOnboardingStatus";
 import { getContentType } from "../lib/notes";
@@ -81,6 +82,11 @@ export const Dashboard = () => {
   const [isModalOpen, setModalOpen] = useState(false);
   const [isShareModalOpen, setShareModalOpen] = useState(false);
   const [notes, setNotes] = useState<Note[]>([]);
+  // Both start true: on first paint nothing has been fetched yet, so the
+  // library is unknown — not empty. Showing "Nothing here yet" before the
+  // request lands would tell a user with 200 saves that they have none.
+  const [isLoadingNotes, setLoadingNotes] = useState(true);
+  const [isLoadingSidebar, setLoadingSidebar] = useState(true);
   const [collections, setCollections] = useState<Collection[]>([]);
   const [tags, setTags] = useState<Tag[]>([]);
   const [activeFilter, setActiveFilter] = useState<ContentFilter>("all");
@@ -173,6 +179,8 @@ export const Dashboard = () => {
       setNotes(posts.data.post || []);
     } catch (error) {
       console.error("Error fetching notes:", error);
+    } finally {
+      setLoadingNotes(false);
     }
   }, [getToken]);
 
@@ -189,6 +197,8 @@ export const Dashboard = () => {
       setTags(nextTags);
     } catch (error) {
       console.error("Error fetching collections and tags:", error);
+    } finally {
+      setLoadingSidebar(false);
     }
   }, [getToken]);
 
@@ -329,6 +339,7 @@ export const Dashboard = () => {
           savedCount={notes.length}
           collections={collections}
           tags={tags}
+          isLoading={isLoadingSidebar}
           activeCollectionId={activeCollectionId}
           activeTag={activeTag}
           onSelectCollection={(id) => {
@@ -504,7 +515,9 @@ export const Dashboard = () => {
         )}
 
         {/* Cards */}
-        {visibleNotes.length === 0 ? (
+        {isLoadingNotes ? (
+          <NotesSkeleton viewMode={viewMode} />
+        ) : visibleNotes.length === 0 ? (
           <div
             data-tour-id="dashboard-cards"
             className="flex flex-col items-center gap-2 rounded-xl border border-dashed border-line py-20 text-center"

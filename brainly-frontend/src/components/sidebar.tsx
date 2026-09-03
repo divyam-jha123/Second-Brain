@@ -9,6 +9,7 @@ import {
 } from "react-icons/lu";
 import { BrainExpoLogo } from "../assets/brand/BrainExpoLogo";
 import { AccountMenu } from "./AccountMenu";
+import { CollectionsSkeleton, TagsSkeleton } from "./skeletons";
 import type { Collection, Tag } from "../lib/api";
 
 export type ContentFilter =
@@ -30,6 +31,8 @@ interface SidebarProps {
   savedCount?: number;
   collections?: Collection[];
   tags?: Tag[];
+  /** Collections and tags are still in flight; show placeholders, not "none". */
+  isLoading?: boolean;
   activeCollectionId?: string | null;
   activeTag?: string | null;
   onSelectCollection?: (id: string | null) => void;
@@ -107,6 +110,7 @@ export const Sidebar = ({
   savedCount,
   collections = [],
   tags = [],
+  isLoading = false,
   activeCollectionId = null,
   activeTag = null,
   onSelectCollection,
@@ -169,6 +173,8 @@ export const Sidebar = ({
 
         <SectionLabel>Collections</SectionLabel>
         <div className="flex flex-col gap-0.5" data-tour-id="sidebar-collections">
+          {isLoading && collections.length === 0 && <CollectionsSkeleton />}
+
           {collections.map((collection) => (
             <NavItem
               key={collection._id}
@@ -218,7 +224,9 @@ export const Sidebar = ({
 
         <SectionLabel>Tags</SectionLabel>
         <div className="flex flex-wrap gap-1.5 px-3" data-tour-id="sidebar-tags">
-          {tags.length === 0 ? (
+          {isLoading && tags.length === 0 ? (
+            <TagsSkeleton />
+          ) : tags.length === 0 ? (
             <p className="text-xs text-fg-subtle">No tags yet</p>
           ) : (
             <>

@@ -37,6 +37,11 @@
 
   --overlay: rgb(24 24 27 / 0.45);
 
+  /* Skeleton placeholders. Tinted toward the brand lavender rather than a
+     neutral grey, so a screen full of them still reads as this product. */
+  --skeleton: #ecebf4;
+  --skeleton-sheen: #f8f8fc;
+
   /* Loading mark. Two stops so the brain reads as lit from the top; on the
      white ground both must clear 3:1 as graphical objects, so light mode uses
      a deeper range than the dark theme's lavender. */
@@ -77,6 +82,9 @@
 
   --overlay: rgb(0 0 0 / 0.65);
 
+  --skeleton: #1f1f25;
+  --skeleton-sheen: #2b2b33;
+
   --loader-top: #CDBFFF;
   --loader-bottom: #7C51FF;
   --loader-flare: #DBD0FF;
@@ -111,6 +119,8 @@
   --color-danger-soft: var(--danger-soft);
 
   --color-overlay: var(--overlay);
+
+  --color-skeleton: var(--skeleton);
 
   --color-loader-top: var(--loader-top);
   --color-loader-bottom: var(--loader-bottom);
@@ -655,4 +665,55 @@ body {
 @keyframes brainNodeSettle {
   0%, 100% { fill: var(--loader-ground, var(--bg)); }
   50%      { fill: var(--loader-bottom); }
+}
+
+/* ---------------------------------------------------------------------------
+   Skeletons.
+
+   A placeholder has one job: hold the exact shape the real thing will occupy,
+   so nothing jumps when the data lands. The sweep is what separates "loading"
+   from "broken" — a single highlight travelling left to right across the
+   block, never a whole-element blink. Stagger comes from the caller setting
+   `--skeleton-delay` per row, so a grid reads as one wave rather than six
+   independent flashes.
+--------------------------------------------------------------------------- */
+@keyframes skeletonSweep {
+  from { transform: translateX(-100%); }
+  to   { transform: translateX(100%); }
+}
+
+.skeleton {
+  position: relative;
+  overflow: hidden;
+  background-color: var(--skeleton);
+}
+
+.skeleton::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--skeleton-sheen) 50%,
+    transparent 100%
+  );
+  animation: skeletonSweep 1.7s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  animation-delay: var(--skeleton-delay, 0s);
+  will-change: transform;
+}
+
+@keyframes skeletonBreathe {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.55; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* No travelling highlight, but the screen still has to say "working": the
+     blocks fade slowly in place instead. */
+  .skeleton::after { animation: none; opacity: 0; }
+  .skeleton {
+    animation: skeletonBreathe 2.6s ease-in-out infinite;
+    animation-delay: var(--skeleton-delay, 0s);
+  }
 }

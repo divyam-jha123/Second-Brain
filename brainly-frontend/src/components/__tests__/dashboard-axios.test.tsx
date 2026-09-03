@@ -43,8 +43,10 @@ describe("Dashboard axios connectivity", () => {
       }),
     );
 
+    // The empty state only appears once the fetch has resolved — before that
+    // the grid shows skeletons, not "you have nothing".
     expect(
-      screen.getByText(/Nothing here yet/i),
+      await screen.findByText(/Nothing here yet/i),
     ).toBeInTheDocument();
   });
 });
